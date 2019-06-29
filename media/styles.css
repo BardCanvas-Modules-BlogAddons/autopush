@@ -1,0 +1,11 @@
+
+.autopush-icon {
+    display: inline-block;
+    font: normal normal normal 14px/1 sans-serif;
+    background: transparent center center no-repeat;
+    background-size: contain;
+}
+
+.autopush-icon:before  { content: '@'; color: transparent; visibility: hidden; }
+.autopush-icon.twitter { background-image: url("twitter.png"); }
+.autopush-icon.discord { background-image: url("discord.png"); }

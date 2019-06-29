@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module>
+    
+    <version>1.0.0</version>
+    <group>modules_blog_addons</group>
+    <admin_only>false</admin_only>
+    
+    <working_flags>
+        <install>true</install>
+        <uninstall>true</uninstall>
+        <enable>true</enable>
+        <disable>true</disable>
+    </working_flags>
+    
+    <template_includes>
+        <always_on>
+            <file>media/styles.css</file>
+        </always_on>
+    </template_includes>
+    
+    <extends_to>
+        <settings>
+            <specs_renderer>
+                <preinits>extenders/settings_preinits.inc</preinits>
+                <autopush_control>extenders/settings_control.inc</autopush_control>
+            </specs_renderer>
+        </settings>
+        <posts>
+            <editor_form>
+                <below_editor>extenders/post_form_extender.inc</below_editor>
+            </editor_form>
+            <quick_post_form>
+                <below_editor>extenders/post_form_extender.inc</below_editor>
+            </quick_post_form>
+            <save_post>
+                <after_setting_metas>extenders/after_saving_post.inc</after_setting_metas>
+            </save_post>
+        </posts>
+    </extends_to>
+    
+</module>

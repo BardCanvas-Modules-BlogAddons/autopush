@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<language>
+    
+    <display_name>Autopush to Social Networks</display_name>
+    <icon>fa-paper-plane</icon>
+    <description><![CDATA[
+        Push posts to social networks automatically after publishing.
+    ]]></description>
+    
+    <add_selector>
+        <default>Add endpoint</default>
+        <option value="twitter">Twitter app</option>
+        <option value="discord">Discord Webhook</option>
+    </add_selector>
+    
+    <new>
+        <twitter>
+            <legend>New Twitter application</legend>
+            <fields>
+                <title>
+                    <caption>Title:</caption>
+                    <placeholder>Title for this endpoint (E.G. @username / appliaction name)</placeholder>
+                </title>
+                <consumer_key>
+                    <caption>API key:</caption>
+                    <placeholder>Consumer API key</placeholder>
+                </consumer_key>
+                <consumer_secret>
+                    <caption>API secret:</caption>
+                    <placeholder>Consumer API secret key</placeholder>
+                </consumer_secret>
+                <token>
+                    <caption>Token key:</caption>
+                    <placeholder>Acces token</placeholder>
+                </token>
+                <token_secret>
+                    <caption>Token secret:</caption>
+                    <placeholder>Acces token secret</placeholder>
+                </token_secret>
+            </fields>
+        </twitter>
+        <discord>
+            <legend>New Discord Webhook</legend>
+            <fields>
+                <title>
+                    <caption>Title:</caption>
+                    <placeholder>Title for this endpoint (E.G. server and channel)</placeholder>
+                </title>
+                <webhook>
+                    <caption>WebHook:</caption>
+                    <placeholder>Enter the URL to the Webhook</placeholder>
+                </webhook>
+            </fields>
+        </discord>
+    </new>
+    
+    <remove>Remove</remove>
+    
+    <autopush_to_socnet>Push to Social Networks</autopush_to_socnet>
+    <push_as_link>Send a link to the post</push_as_link>
+    <push_as_pieces>Send in pieces - one message per paragraph</push_as_pieces>
+    
+    <pushing_methods>
+        <as_link>link</as_link>
+        <as_pieces>pieces</as_pieces>
+    </pushing_methods>
+    
+    <aslink_info_dialog>
+        <title>Pushing post as link</title>
+        <contents><![CDATA[
+            <p>
+                Selecting this method is pretty straightforward:
+                the post's excerpt will be sent with the permalink to the post.
+            </p>
+            <p>
+                <b>Warning:</b> make sure the excerpt is as shorter as possible to hold the permalink.
+            </p>
+            <p>
+                If the target network provides cards functionality, the post card will be rendered
+                (all SEO tags will be in place).<br>
+                Just make sure to set a featured image to the post to render as thumbnail.
+            </p>
+        ]]></contents>
+    </aslink_info_dialog>
+    
+    <aspieces_info_dialog>
+        <title>Pushing post in pieces</title>
+        <contents><![CDATA[
+            <p>
+                This method extracts headings and paragraphs from the contents and posts them
+                in sequence. Please take in account the next considerations:
+            </p>
+            <ul>
+                <li>
+                    <b>Keep it short for Twitter.</b>
+                    If the post has too much contents, avoid using this method on Twitter <u>at all costs</u>.
+                    Twitter doesn't like spam, and you might get your application or account banned.
+                </li>
+                <li>
+                    <b>Keep it simple.</b>
+                    The contents parser will only extract headings (all levels) and paragraphs.
+                    <u>All other element types will be discarded</u>, so avoid inserting
+                    blockquotes, divs, preformatted paragraphs, code blocks, lists, etc.<br>
+                    <u>Styles, links, embeds, etc. will be removed from the paragraph</u>.
+                </li>
+                <li>
+                    <b>Add images or videos into paragraphs.</b>
+                    If you want to upload images or videos, you'll have to separate them using paragraphs.
+                    Just make sure to add <u>a single image or video per paragraph</u>.
+                </li>
+            </ul>
+        ]]></contents>
+    </aspieces_info_dialog>
+    
+    <post_types>
+        <link>link</link>
+        <image>image</image>
+        <video>video</video>
+        <message>message</message>
+    </post_types>
+    
+    <messages>
+        
+        <invalid_endpoint><![CDATA[
+            Sorry, but the endpoint <span class="alternate">%s</span> isn't registered for autopushing.
+        ]]></invalid_endpoint>
+        <invalid_method><![CDATA[
+            Sorry, but the method <code>%s</code> specified for the endpoint <span class="alternate">%s</span> isn't valid.
+        ]]></invalid_method>
+        <push_ok><![CDATA[
+            Post successfully pushed to %s through <span class="alternate">%s</span>
+            (%s/%s messages sent)
+        ]]></push_ok>
+        <pushed_info><![CDATA[
+            Pushed as {$pushed_as} by {$sender} on {$date}.
+            Messages sent: {$sent}/{$count}.
+        ]]></pushed_info>
+        
+        <empty_content><![CDATA[
+            Sorry, but couldn't extract the data to push to %s through %s.
+        ]]></empty_content>
+        
+        <cannot_post_to_twitter><![CDATA[
+            Unable to post %s "%s" to Twitter through %s:<br>
+            %s
+        ]]></cannot_post_to_twitter>
+        <empty_twitter_res><![CDATA[
+            No response received from Twitter after pushing the %s "%s".
+            It isn't possible to know if the message was posted or not.
+        ]]></empty_twitter_res>
+        <unknown_twitter_res><![CDATA[
+            The %s "%s" was submitted but Twitter's response doesn't seem to be a valid object:
+            %s
+        ]]></unknown_twitter_res>
+        
+        <cannot_post_to_discord><![CDATA[
+            Unable to post %s "%s" to Discord due to a network/server error:<br>
+            %s
+        ]]></cannot_post_to_discord>
+        <empty_discord_res><![CDATA[
+            No response received from Discord after pushing the %s "%s".
+            It isn't possible to know if the message was posted or not.
+        ]]></empty_discord_res>
+        <unknown_discord_res><![CDATA[
+            The %s "%s" was submitted but Discord's response doesn't seem to be a valid object:
+            %s
+        ]]></unknown_discord_res>
+        
+    </messages>
+    
+    <settings_data>
+        <title>Autopushing</title>
+        
+        <!--
+        Value format:
+        ┌───────────────────────────────────────────────────────────────────────────┐
+        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
+        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
+        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
+        │ discord: title, webhook_url                                               │
+        │ discord: title, webhook_url                                               │
+        │ discord: title, webhook_url                                               │
+        └───────────────────────────────────────────────────────────────────────────┘
+        -->
+        <specs key="endpoints">
+            <title>Social network endpoints</title>
+            <description><![CDATA[
+                Specify the endpoints on social networks you want to push posts to.<br>
+                This module supports pushing to:
+                <ul>
+                    <li>
+                        Twitter: a client application must be created at the
+                        <a href="https://developer.twitter.com" target="_blank">Twitter Developer</a> site
+                        and the next details must be provided for each application:
+                        <ul>
+                            <li>Consumer key</li>
+                            <li>Consumer secret</li>
+                            <li>Access token</li>
+                            <li>Access token secret</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Discord: for each channel on your server, you need to create a
+                        <a href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank">Webhook</a>,
+                        then provide the URL to each Webhook you've created.
+                    </li>
+                </ul>
+                <span class="critical">
+                    <i class="fa fa-warning"></i> <b>Important:</b>
+                </span>
+                automatic pushing options on the posts composer are tied to the
+                <span class="alternate">User level allowed to edit custom fields</span>
+                option on the <span class="greengo">Posts reading/writing > Interface group</span>.<br>
+                Only users of the defined level and up will be able to push posts to
+                the Social Network endpoints defined here.
+            ]]></description>
+            <type>@autopush:specs_renderer/autopush_control</type>
+        </specs>
+        
+    </settings_data>
+    
+</language>
