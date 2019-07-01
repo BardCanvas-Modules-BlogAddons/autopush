@@ -1,0 +1,9 @@
+
+#autopush_options                                      { margin-bottom: 20px; }
+#autopush_options .endpoint_control                    { margin-top: 0; margin-bottom: 10px; }
+#autopush_options .endpoint_control:last-child         { margin-bottom: 0; }
+#autopush_options .endpoint_control .autopush-icon     { font-size: 1.2rem; }
+#autopush_options .endpoint_control .last_push_message ,
+#autopush_options .endpoint_control p                  { margin: 5px 0; }
+
+#autopush_link_message_area { margin-top: 10px; }
