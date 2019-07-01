@@ -13,6 +13,7 @@
     </working_flags>
     
     <template_includes>
+        <pre_rendering>set_globals.inc</pre_rendering>
         <always_on>
             <file>media/styles.css</file>
         </always_on>
