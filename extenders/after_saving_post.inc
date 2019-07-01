@@ -130,7 +130,10 @@ foreach($_POST["autopush_to"] as $network => $slugs )
         $config->globals["@autopush:messages_sent"]  = 0;
         
         # Actual push
-        $toolbox->push($network, $method, $endpoints[$network][$slug], $post, $account);
+        $toolbox->push(
+            $network, $method, $endpoints[$network][$slug], $post, $account, true,
+            trim(stripslashes($_POST["autopush_link_message"]))
+        );
         
         if( ! empty($config->globals["@autopush:sending_errors"]) ) continue;
         

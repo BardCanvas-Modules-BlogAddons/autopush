@@ -59,6 +59,7 @@
     <autopush_to_socnet>Push to Social Networks</autopush_to_socnet>
     <push_as_link>Send a link to the post</push_as_link>
     <push_as_pieces>Send in pieces - one message per paragraph</push_as_pieces>
+    <link_message_placeholder>Type a message to send with the link to those endpoints you've chosen with this method</link_message_placeholder>
     
     <pushing_methods>
         <as_link>link</as_link>
@@ -70,10 +71,10 @@
         <contents><![CDATA[
             <p>
                 Selecting this method is pretty straightforward:
-                the post's excerpt will be sent with the permalink to the post.
+                the post is sent as a link, with an optional (highly recommended) message with it.
             </p>
             <p>
-                <b>Warning:</b> make sure the excerpt is as shorter as possible to hold the permalink.
+                <b>Warning:</b> make sure the message is as shorter as possible to hold the permalink.
             </p>
             <p>
                 If the target network provides cards functionality, the post card will be rendered
