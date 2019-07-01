@@ -5,7 +5,7 @@
  * @var post_record $post
  *
  * @package    BardCanvas
- * @subpackage polls
+ * @subpackage Autopush
  * @author     Alejandro Caballero - lava.caballero@gmail.com
  * 
  * $_POST params:

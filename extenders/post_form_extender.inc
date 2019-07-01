@@ -3,7 +3,7 @@
  * Posts extender: additions to form below the editor
  *
  * @package    BardCanvas
- * @subpackage polls
+ * @subpackage Autopush
  * @author     Alejandro Caballero - lava.caballero@gmail.com
  */
 
