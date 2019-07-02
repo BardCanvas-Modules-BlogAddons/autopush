@@ -167,6 +167,18 @@
             %s
         ]]></unknown_discord_res>
         
+        <cannot_fetch_image><![CDATA[
+            Unable to fetch image file "%s" due to a network/server error:<br>
+            %s<br>
+            Image will be skipped.
+        ]]></cannot_fetch_image>
+        <invalid_image_type><![CDATA[
+            Sorry, but image file "%s" is not a valid JPEG/PNG/GIF image. It has been skipped.
+        ]]></invalid_image_type>
+        <image_is_empty><![CDATA[
+            Image file "%s" is empty. It cannot be pushed. It will be skipped.
+        ]]></image_is_empty>
+        
     </messages>
     
     <settings_data>

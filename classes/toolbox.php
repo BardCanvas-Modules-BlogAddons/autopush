@@ -126,17 +126,84 @@ class toolbox
         {
             if( substr($message, 0, 7) == "<image>" )
             {
-                $type    = trim($current_module->language->post_types->image);
-                $message = str_replace("<image>", "", $message);
-                $title   = basename($message);
-                $file    = $config->datafiles_location . "/uploaded_media/"
-                         . preg_replace("#http.*/mediaserver/#i", "", $message);
-    
+                $type  = trim($current_module->language->post_types->image);
+                $url   = str_replace("<image>", "", $message);
+                $title = basename($url);
+                
+                $delete_file_after_upload = false;
+                if( stristr($url, "/mediaserver/") !== false )
+                {
+                    $file = $config->datafiles_location . "/uploaded_media/"
+                          . preg_replace("#http.*/mediaserver/#i", "", $url);
+                }
+                else
+                {
+                    $ch  = curl_init();
+                    curl_setopt($ch, CURLOPT_URL,            $url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                    
+                    $data = curl_exec($ch);
+                    
+                    if( curl_error($ch) )
+                    {
+                        $error = unindent(sprintf(
+                            $current_module->language->messages->cannot_fetch_image,
+                            $title, curl_error($ch)
+                        ));
+                        
+                        $config->globals["@autopush:sending_errors"][] = $error;
+                        
+                        if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                        
+                        curl_close($ch);
+                        continue;
+                    }
+                    
+                    $info = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+                    
+                    if( ! preg_match("#image/(png|jpg|jpeg|gif)#i", $info) )
+                    {
+                        $error = unindent(sprintf(
+                            $current_module->language->messages->invalid_image_type,
+                            $title, curl_error($ch)
+                        ));
+                        
+                        $config->globals["@autopush:sending_errors"][] = $error;
+                        
+                        if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                        
+                        curl_close($ch);
+                        continue;
+                    }
+                    
+                    if( empty($data) )
+                    {
+                        $error = trim($current_module->language->messages->image_is_empty);
+                        
+                        $config->globals["@autopush:sending_errors"][] = $error;
+                        
+                        if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                        
+                        curl_close($ch);
+                        continue;
+                    }
+                    
+                    $ext  = strtolower(end(explode("/", $info)));
+                    $file = $config->datafiles_location . "/tmp/img-" . microtime(true) . "." . $ext;
+                    file_put_contents($file, $data);
+                    $delete_file_after_upload = true;
+                    curl_close($ch);
+                }
+                
                 $res = $this->tweet(
                     $connection, "media/upload", array("media" => $file), $type, $title, $endpoint_data, $notifications_target
                 );
                 
                 if( ! $res ) continue;
+                
+                if( $delete_file_after_upload ) @unlink($file);
                 
                 $media_id = $res->media_id_string;
                 
