@@ -120,7 +120,23 @@
         <message>message</message>
     </post_types>
     
+    <dialog>
+        <title>Push element to Social Networks</title>
+        <url>
+            <caption>URL to push:</caption>
+            <placeholder>Type/paste URL of the element to push</placeholder>
+        </url>
+    </dialog>
+    
     <messages>
+        
+        <no_endpoints_defined><![CDATA[
+            Sorry, but there are no Social Network endpoints defined.
+        ]]></no_endpoints_defined>
+        
+        <missing_url>Please specify a URL to push.</missing_url>
+        <invalid_url>Please specify a fully qualified URL.</invalid_url>
+        <no_endpoints_selected>Please select those endpoints you wish to push the URL to.</no_endpoints_selected>
         
         <invalid_endpoint><![CDATA[
             Sorry, but the endpoint <span class="alternate">%s</span> isn't registered for autopushing.

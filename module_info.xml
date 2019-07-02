@@ -14,6 +14,7 @@
     
     <template_includes>
         <pre_rendering>set_globals.inc</pre_rendering>
+        <post_footer>post_footer_scripts.inc</post_footer>
         <always_on>
             <file>media/styles.css</file>
         </always_on>

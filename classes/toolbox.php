@@ -22,16 +22,16 @@ class toolbox
     }
     
     /**
-     * @param string      $network
-     * @param string      $method          as_link|as_pieces
-     * @param array       $endpoint_data
-     * @param post_record $post
-     * @param account     $sender
-     * @param bool        $notify_errors   If true, errors will be notified to the sender.
-     *                                     If false, errors will be logged on $config->globals["@autopush:sending_errors"]
-     * @param string      $as_link_message Message to send with the link (if the method is "as_link".
+     * @param string             $network
+     * @param string             $method          as_link|as_pieces
+     * @param array              $endpoint_data
+     * @param post_record|string $pushing_element Post record or ULR being pushed
+     * @param account            $sender
+     * @param bool               $notify_errors   If true, errors will be notified to the sender.
+     *                                            If false, errors will be logged on $config->globals["@autopush:sending_errors"]
+     * @param string             $as_link_message Message to send with the link (if the method is "as_link".
      */
-    public function push($network, $method, $endpoint_data, $post, $sender, $notify_errors = true, $as_link_message = "")
+    public function push($network, $method, $endpoint_data, $pushing_element, $sender, $notify_errors = true, $as_link_message = "")
     {
         global $modules, $config;
         
@@ -44,8 +44,8 @@ class toolbox
         
         $notifications_target = $notify_errors ? $sender->id_account : false;
         
-        if( $network == "twitter" ) $this->post_to_twitter($method, $endpoint_data, $post, $notifications_target, $as_link_message);
-        else                        $this->post_to_discord($method, $endpoint_data, $post, $notifications_target, $as_link_message);
+        if( $network == "twitter" ) $this->post_to_twitter($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
+        else                        $this->post_to_discord($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
         
         if( $config->globals["@autopush:messages_sent"] == 0 ) return;
         
@@ -59,22 +59,24 @@ class toolbox
             )
         ));
         
-        $post->set_meta("@autopush:$network.last_push", $message);
+        if( is_object($pushing_element) )
+            $pushing_element->set_meta("@autopush:$network.last_push", $message);
     }
     
     /**
-     * @param string      $method               as_link | as_pieces
-     * @param array       $endpoint_data        [title, api_key, api_secret, token_key, token_secret]
-     * @param post_record $post
-     * @param int|bool    $notifications_target Account id to notify or false for no notifications
-     * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
+     * @param string             $method               as_link | as_pieces
+     * @param array              $endpoint_data        [title, api_key, api_secret, token_key, token_secret]
+     * @param post_record|string $pushing_element      Post record or URL being pushed
+     * @param int|bool           $notifications_target Account id to notify or false for no notifications
+     * @param string             $as_link_message      Message to send with the link (if the method is "as_link".
      */
-    private function post_to_twitter($method, $endpoint_data, $post, $notifications_target, $as_link_message)
+    private function post_to_twitter($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message)
     {
         global $modules, $config;
         $current_module = $modules["autopush"];
         
-        $content = $this->get_processed_content($post, $method);
+        if( is_string($pushing_element) ) $content = $pushing_element;
+        else                              $content = $this->get_processed_content($pushing_element, $method);
         if( empty($content) )
         {
             $error = unindent(sprintf(
@@ -98,13 +100,17 @@ class toolbox
         
         if( $method == "as_link" )
         {
+            if( is_object($pushing_element) )
+                $title = empty($as_link_message) ? $pushing_element->get_processed_excerpt(true) : $as_link_message;
+            else
+                $title = $as_link_message;
+            
             $type  = trim($current_module->language->post_types->link);
-            $title = empty($as_link_message) ? $post->get_processed_excerpt(true) : $as_link_message;
             if( strlen($title) > 250 ) $title = make_excerpt_of($title, 250, false);
             $link  = $content;
             
             $data = array(
-                "status" => "$title $link"
+                "status" => trim("$title $link")
             );
             
             $res = $this->tweet(
@@ -348,11 +354,11 @@ class toolbox
     /**
      * @param string      $method               as_link|as_pieces
      * @param array       $endpoint_data        [title, webhook]
-     * @param post_record $post
+     * @param post_record $pushing_element      Post record or URL to post
      * @param int|bool    $notifications_target Account id to notify or false for no notifications
      * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
      */
-    private function post_to_discord($method, $endpoint_data, $post, $notifications_target, $as_link_message)
+    private function post_to_discord($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message)
     {
         global $modules, $config;
         
@@ -367,7 +373,9 @@ class toolbox
         curl_setopt($ch, CURLOPT_POST,           1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         
-        $content  = $this->get_processed_content($post, $method);
+        if( is_string($pushing_element) ) $content = $pushing_element;
+        else                              $content  = $this->get_processed_content($pushing_element, $method);
+        
         if( empty($content) )
         {
             $error = unindent(sprintf(
@@ -385,14 +393,18 @@ class toolbox
         
         if( $method == "as_link" )
         {
-            $title = empty($as_link_message) ? $post->get_processed_excerpt(true) : $as_link_message;
+            if( is_object($pushing_element) )
+                $title = empty($as_link_message) ? $pushing_element->get_processed_excerpt(true) : $as_link_message;
+            else
+                $title = $as_link_message;
+            
             $link  = $content;
             
             $payloads[] = (object) array(
                 "type"  => trim($current_module->language->post_types->link),
                 "title" => make_excerpt_of($link),
                 "data"  => array(
-                    "content" => $title . "\n" . $link
+                    "content" => trim($title . "\n" . $link)
                 )
             );
         }

@@ -28,7 +28,7 @@ use hng2_base\template;
                 $style = ""; # $network == "twitter" ? "pointer-events: none" : "";
                 ?>
                 <div class="col framed_content endpoint_control <?= $class ?>" data-network="<?= $network ?>" style="<?= $style ?>">
-                    <p>
+                    <p class="endpoint_checkbox">
                         <label class="alternate">
                             <input type="checkbox" name="autopush_to[<?= $network ?>][<?= $slug ?>][proceed]"
                                    value="true"
@@ -37,7 +37,7 @@ use hng2_base\template;
                             <?= $data["title"] ?>
                         </label>
                     </p>
-                    <div style="margin-left: 26px">
+                    <div class="endpoint_radios" style="margin-left: 26px">
                         <div class="framed_content state_highlight last_push_message" style="display: none"></div>
                         <p>
                             <label>
