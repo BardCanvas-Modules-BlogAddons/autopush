@@ -1,6 +1,10 @@
 
 # Autopush Module Change Log
 
+## [1.2.1] - 2019-07-01
+
+- Tweaked file title on twitter image uploads.
+
 ## [1.2.0] - 2019-07-01
 
 - Fixed doc errors.
