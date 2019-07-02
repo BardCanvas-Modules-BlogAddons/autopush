@@ -134,17 +134,17 @@ class toolbox
             {
                 $type  = trim($current_module->language->post_types->image);
                 $url   = str_replace("<image>", "", $message);
-                $title = basename($url);
                 
                 $delete_file_after_upload = false;
                 if( stristr($url, "/mediaserver/") !== false )
                 {
-                    $file = $config->datafiles_location . "/uploaded_media/"
-                          . preg_replace("#http.*/mediaserver/#i", "", $url);
+                    $file  = $config->datafiles_location . "/uploaded_media/"
+                           . preg_replace("#http.*/mediaserver/#i", "", $url);
+                    $title = ucwords(str_replace(array("-", "_", "."), " ", basename($file)));
                 }
                 else
                 {
-                    $ch  = curl_init();
+                    $ch = curl_init();
                     curl_setopt($ch, CURLOPT_URL,            $url);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
@@ -201,6 +201,7 @@ class toolbox
                     file_put_contents($file, $data);
                     $delete_file_after_upload = true;
                     curl_close($ch);
+                    $title = $url;
                 }
                 
                 $res = $this->tweet(
