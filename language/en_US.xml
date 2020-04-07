@@ -261,8 +261,7 @@
         <specs key="endpoints">
             <title>Social network endpoints</title>
             <description><![CDATA[
-                Specify the endpoints on social networks you want to push posts to.<br><br>
-                
+                Specify the endpoints on social networks you want to push posts to.
                 <span class="framed_content inlined pseudo_link state_ok"
                       onclick="$('#autopush_endpoints_details').toggle()">
                     Toggle details
@@ -306,6 +305,72 @@
                 </div>
             ]]></description>
             <type>@autopush:specs_renderer/autopush_control</type>
+        </specs>
+        
+        <specs key="automated_push_directives">
+            <title>Automated push directives for regular user posts</title>
+            <description><![CDATA[
+                If you want to push links to posts published by regular users
+                (those below the required level to edit custom fields),
+                Specify the directives here.
+                <span class="framed_content inlined pseudo_link state_ok"
+                      onclick="$('#autopush_directives_details').toggle()">
+                    Toggle details
+                </span>
+                
+                <div id="autopush_directives_details" style="display: none">
+                    <br>
+                    Specify one directive per line using the next syntax:
+                    
+                    <pre>network/Channel title: category_slugs|*
+network/Channel title: category_slugs|*
+network/Channel title: category_slugs|*</pre>
+                    
+                    You can type a single category slug or a comma separated list of category slugs.<br>
+                    If you specify an asterisk instead of category slugs, all categories will be included,
+                    but <b>only public categories</b> will be considered. Examples:
+                    
+                    <pre>Twitter/My Twitter page: <b>user_news, interesting_posts</b>
+Telegram/My main Telegram channel: <b>*</b>
+Discord/My Discord channel 1: <b>*</b>
+Discord/My Discord channel 2: <b>user_news</b></pre>
+                    
+                    If you want to temprarily disable a directive, add a <code>#</code> at the beginning of its line.<br><br>
+                    
+                    <i class="fa fa-info-circle"></i> <b>Note:</b>
+                    automated pushing messages and errors aren't sent to the
+                    user publishing the post. They're logged on the "Autopush Submissions" log.
+                </div>
+            ]]></description>
+            <type>code</type>
+        </specs>
+        
+        <specs key="automated_push_caption">
+            <title>Automated push messages caption</title>
+            <description><![CDATA[
+                When an automated push goes green by the directives above,
+                a message prefix can be added.
+                <span class="framed_content inlined pseudo_link state_ok"
+                      onclick="$('#autopush_autocaption_details').toggle()">
+                    Toggle details
+                </span>
+                
+                <div id="autopush_autocaption_details" style="display: none">
+                    <br>
+                    Use the textbox to define the caption to use, E.G.:
+                    
+                    <pre>John Doe has posted an article!</pre>
+                    
+                    Optionally, you can add <code>{$user_name}</code> where the user name should
+                    be injected and <code>{$category}</code> to inject
+                    the post main category, E.G.:
+                    
+                    <pre><code>{$user_name}</code> has posted an article on the <code>{$category}</code> category!</pre>
+                    
+                    If nothing is set, the excerpt of the post will be injected.
+                </div>
+            ]]></description>
+            <type>text</type>
         </specs>
         
     </settings_data>
