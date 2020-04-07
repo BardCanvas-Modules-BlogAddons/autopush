@@ -261,41 +261,49 @@
         <specs key="endpoints">
             <title>Social network endpoints</title>
             <description><![CDATA[
-                Specify the endpoints on social networks you want to push posts to.<br>
-                This module supports pushing to:
-                <ul>
-                    <li>
-                        Twitter: a client application must be created at the
-                        <a href="https://developer.twitter.com" target="_blank">Twitter Developer</a> site
-                        and the next details must be provided for each application:
-                        <ul>
-                            <li>Consumer key</li>
-                            <li>Consumer secret</li>
-                            <li>Access token</li>
-                            <li>Access token secret</li>
-                        </ul>
-                    </li>
-                    <li>
-                        Discord: for each channel on your server, you need to create a
-                        <a href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank">Webhook</a>,
-                        then provide the URL to each Webhook you've created.
-                    </li>
-                    <li>
-                        Telegram: you need to create a bot and get a token, then
-                        specify the targets you want to push to
-                        (<code>@chat</code> or <code>@channel</code>).<br>
-                        <b>Note:</b> you'll need to add your bot to the target chat/channel and grant it posting privileges.<br>
-                        <a href="https://core.telegram.org/bots#3-how-do-i-create-a-bot" target="_blank">Click here</a> to learn how to create a bot.
-                    </li>
-                </ul>
-                <span class="critical">
-                    <i class="fa fa-warning"></i> <b>Important:</b>
+                Specify the endpoints on social networks you want to push posts to.<br><br>
+                
+                <span class="framed_content inlined pseudo_link state_ok"
+                      onclick="$('#autopush_endpoints_details').toggle()">
+                    Toggle details
                 </span>
-                automatic pushing options on the posts composer are tied to the
-                <span class="alternate">User level allowed to edit custom fields</span>
-                option on the <span class="greengo">Posts reading/writing > Interface group</span>.<br>
-                Only users of the defined level and up will be able to push posts to
-                the Social Network endpoints defined here.
+                
+                <div id="autopush_endpoints_details" style="display: none">
+                    <br>
+                    This module supports pushing to:
+                    <ul>
+                        <li>
+                            Twitter: a client application must be created at the
+                            <a href="https://developer.twitter.com" target="_blank">Twitter Developer</a> site
+                            and the next details must be provided for each application:
+                            <ul>
+                                <li>Consumer key</li>
+                                <li>Consumer secret</li>
+                                <li>Access token</li>
+                                <li>Access token secret</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Discord: for each channel on your server, you need to create a
+                            <a href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank">Webhook</a>,
+                            then provide the URL to each Webhook you've created.
+                        </li>
+                        <li>
+                            Telegram: you need to create a bot and get a token, then
+                            specify the targets you want to push to
+                            (<code>@chat</code> or <code>@channel</code>).<br>
+                            <b>Note:</b> you'll need to add your bot to the target chat/channel and grant it posting privileges.<br>
+                            <a href="https://core.telegram.org/bots#3-how-do-i-create-a-bot" target="_blank">Click here</a> to learn how to create a bot.
+                        </li>
+                    </ul>
+                    
+                    <span class="critical"><i class="fa fa-warning"></i> <b>Important:</b></span>
+                    automatic pushing options on the posts composer are tied to the
+                    <span class="alternate">User level allowed to edit custom fields</span>
+                    option on the <span class="greengo">Posts reading/writing > Interface group</span>.<br>
+                    Only users of the defined level and up will be able to push posts to
+                    the Social Network endpoints defined here.
+                </div>
             ]]></description>
             <type>@autopush:specs_renderer/autopush_control</type>
         </specs>
