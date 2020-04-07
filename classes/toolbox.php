@@ -565,12 +565,14 @@ class toolbox
             else
                 $title = $as_link_message;
             
+            $caption = str_replace(array("http://", "https://", "www."), "", make_excerpt_of($content, 50));
+            
             $payloads[] = (object) array(
                 "endpoint" => "sendMessage",
                 "title"    => $title,
                 "data" => array(
                     "chat_id"    => $endpoint_data["target"],
-                    "text"       => sprintf('<a href="%s">%s</a>', $content, $title),
+                    "text"       => sprintf('%s <a href="%s">%s</a>', $title, $content, $caption),
                     "parse_mode" => "HTML",
                 )
             );
