@@ -74,7 +74,7 @@ if( empty($endpoints) ) return;
         $('#autopush_element_dialog').dialog('open');
     }
     
-    function autopush_element_prepare(data, $form, options)
+    function autopush_element_prepare(data, $form)
     {
         $form.closest('.ui-dialog').block(blockUI_default_params);
     }
