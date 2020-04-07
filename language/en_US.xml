@@ -195,6 +195,15 @@
             Image file "%s" is empty. It cannot be pushed. It will be skipped.
         ]]></image_is_empty>
         
+        <post_not_public><![CDATA[
+            Sorry, but this post can't be pushed to Social Networks
+            because it isn't public.
+        ]]></post_not_public>
+        <post_category_not_public><![CDATA[
+            Sorry, but this post can't be pushed to Social Networks
+            because the post main category not public.
+        ]]></post_category_not_public>
+        
     </messages>
     
     <settings_data>
