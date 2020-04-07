@@ -126,7 +126,6 @@ foreach($_POST["autopush_to"] as $network => $slugs )
                 "warning",
                 sprintf($this_module->language->messages->invalid_method, $method, $title)
             );
-            sleep(1);
             
             continue;
         }
@@ -155,7 +154,6 @@ foreach($_POST["autopush_to"] as $network => $slugs )
                 $config->globals["@autopush:messages_count"]
             ))
         );
-        sleep( 1 );
     }
 }
 

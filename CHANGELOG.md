@@ -1,6 +1,13 @@
 
 # Autopush Module Change Log
 
+## [Unreleased]
+
+- Minimal corrections.
+- Improvements on the settings editor.
+- Added post visibility validations.
+- Added support for Telegram.
+
 ## [1.2.1] - 2019-07-01
 
 - Tweaked file title on twitter image uploads.
