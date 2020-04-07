@@ -6,6 +6,7 @@
     background-size: contain;
 }
 
-.autopush-icon:before  { content: '@'; color: transparent; visibility: hidden; }
-.autopush-icon.twitter { background-image: url("twitter.png"); }
-.autopush-icon.discord { background-image: url("discord.png"); }
+.autopush-icon:before   { content: '@'; color: transparent; visibility: hidden; }
+.autopush-icon.twitter  { background-image: url("twitter.png"); }
+.autopush-icon.discord  { background-image: url("discord.png"); }
+.autopush-icon.telegram { background-image: url("telegram.png"); }

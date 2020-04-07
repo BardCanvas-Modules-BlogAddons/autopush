@@ -11,6 +11,7 @@
         <default>Add endpoint</default>
         <option value="twitter">Twitter app</option>
         <option value="discord">Discord Webhook</option>
+        <option value="telegram">Telegram bot</option>
     </add_selector>
     
     <new>
@@ -52,6 +53,23 @@
                 </webhook>
             </fields>
         </discord>
+        <telegram>
+            <legend>New Telegram target</legend>
+            <fields>
+                <title>
+                    <caption>Title:</caption>
+                    <placeholder>Title for this endpoint (E.G. chat or channel)</placeholder>
+                </title>
+                <token>
+                    <caption>Bot token:</caption>
+                    <placeholder>Enter the bot API token</placeholder>
+                </token>
+                <target>
+                    <caption>Target:</caption>
+                    <placeholder>@identifier</placeholder>
+                </target>
+            </fields>
+        </telegram>
     </new>
     
     <remove>Remove</remove>
@@ -183,6 +201,23 @@
             %s
         ]]></unknown_discord_res>
         
+        <cannot_post_to_telegram><![CDATA[
+            Unable to post %s "%s" to Telegram due to a network/server error:<br>
+            %s
+        ]]></cannot_post_to_telegram>
+        <empty_telegram_res><![CDATA[
+            No response received from Telegram after pushing the %s "%s".
+            It isn't possible to know if the message was posted or not.
+        ]]></empty_telegram_res>
+        <unknown_telegram_res><![CDATA[
+            The %s "%s" was submitted but Telegram's response doesn't seem to be a valid object:
+            %s
+        ]]></unknown_telegram_res>
+        <telegram_api_error_received><![CDATA[
+            Telegram returned an error when posting %s "%s":<br>
+            %s
+        ]]></telegram_api_error_received>
+        
         <cannot_fetch_image><![CDATA[
             Unable to fetch image file "%s" due to a network/server error:<br>
             %s<br>
@@ -218,6 +253,9 @@
         │ discord: title, webhook_url                                               │
         │ discord: title, webhook_url                                               │
         │ discord: title, webhook_url                                               │
+        │ telegram: title, token, target                                            │
+        │ telegram: title, token, target                                            │
+        │ telegram: title, token, target                                            │
         └───────────────────────────────────────────────────────────────────────────┘
         -->
         <specs key="endpoints">
@@ -241,6 +279,13 @@
                         Discord: for each channel on your server, you need to create a
                         <a href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank">Webhook</a>,
                         then provide the URL to each Webhook you've created.
+                    </li>
+                    <li>
+                        Telegram: you need to create a bot and get a token, then
+                        specify the targets you want to push to
+                        (<code>@chat</code> or <code>@channel</code>).<br>
+                        <b>Note:</b> you'll need to add your bot to the target chat/channel and grant it posting privileges.<br>
+                        <a href="https://core.telegram.org/bots#3-how-do-i-create-a-bot" target="_blank">Click here</a> to learn how to create a bot.
                     </li>
                 </ul>
                 <span class="critical">

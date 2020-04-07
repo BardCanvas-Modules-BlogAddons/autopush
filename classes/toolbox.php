@@ -5,6 +5,7 @@ namespace hng2_modules\autopush;
 
 use hng2_base\account;
 use hng2_base\module;
+use hng2_media\media_repository;
 use hng2_modules\posts\post_record;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use phpQuery;
@@ -44,8 +45,18 @@ class toolbox
         
         $notifications_target = $notify_errors ? $sender->id_account : false;
         
-        if( $network == "twitter" ) $this->post_to_twitter($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
-        else                        $this->post_to_discord($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
+        switch( $network )
+        {
+            case "twitter":
+                $this->post_to_twitter($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
+                break;
+            case "discord":
+                $this->post_to_discord($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
+                break;
+            case "telegram":
+                $this->post_to_telegram($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
+                break;
+        }
         
         if( $config->globals["@autopush:messages_sent"] == 0 ) return;
         
@@ -156,7 +167,7 @@ class toolbox
                     {
                         $error = unindent(sprintf(
                             $current_module->language->messages->cannot_fetch_image,
-                            $title, curl_error($ch)
+                            $url, curl_error($ch)
                         ));
                         
                         $config->globals["@autopush:sending_errors"][] = $error;
@@ -517,6 +528,184 @@ class toolbox
     }
     
     /**
+     * @param string      $method               as_link|as_pieces
+     * @param array       $endpoint_data        [title, token, target]
+     * @param post_record $pushing_element      Post record or URL to post
+     * @param int|bool    $notifications_target Account id to notify or false for no notifications
+     * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
+     */
+    private function post_to_telegram($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message)
+    {
+        global $modules, $config;
+        
+        $current_module = $modules["autopush"];
+        
+        if( is_string($pushing_element) ) $content = $pushing_element;
+        else                              $content = $this->get_processed_content($pushing_element, $method);
+        
+        if( empty($content) )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->empty_content, "Telegram", $endpoint_data["title"]
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        $payloads = array();
+        
+        if( $method == "as_link" )
+        {
+            if( is_object($pushing_element) )
+                $title = empty($as_link_message) ? $pushing_element->get_processed_excerpt(true) : $as_link_message;
+            else
+                $title = $as_link_message;
+            
+            $payloads[] = (object) array(
+                "endpoint" => "sendMessage",
+                "title"    => $title,
+                "data" => array(
+                    "chat_id"    => $endpoint_data["target"],
+                    "text"       => sprintf('<a href="%s">%s</a>', $content, $title),
+                    "parse_mode" => "HTML",
+                )
+            );
+        }
+        else
+        {
+            foreach($content as $message)
+            {
+                if( substr($message, 0, 7) == "<image>" )
+                {
+                    $message    = str_replace("<image>", "", $message);
+                    $payloads[] = (object) array(
+                        "endpoint" => "sendPhoto",
+                        "title"    => $message,
+                        "data" => array(
+                            "chat_id"    => $endpoint_data["target"],
+                            "photo"      => $message,
+                            "caption"    => basename($message),
+                            "parse_mode" => "HTML",
+                        )
+                    );
+                }
+                elseif( substr($message, 0, 7) == "<video>" )
+                {
+                    $message    = str_replace("<video>", "", $message);
+                    $payloads[] = (object) array(
+                        "endpoint" => "sendVideo",
+                        "title"    => $message,
+                        "data" => array(
+                            "chat_id"    => $endpoint_data["target"],
+                            "video"      => $message,
+                            "caption"    => basename($message),
+                            "parse_mode" => "HTML",
+                        )
+                    );
+                }
+                else
+                {
+                    $payloads[] = (object) array(
+                        "endpoint" => "sendMessage",
+                        "title"    => make_excerpt_of($message),
+                        "data" => array(
+                            "chat_id"    => $endpoint_data["target"],
+                            "text"       => make_excerpt_of($message, 3000),
+                            "parse_mode" => "HTML",
+                        )
+                    );
+                }
+            }
+        }
+        
+        foreach($payloads as $item)
+        {
+            $url = "https://api.telegram.org/bot{$endpoint_data["token"]}/{$item->endpoint}";
+            $ch  = curl_init();
+            curl_setopt($ch, CURLOPT_URL,            $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_POST,           1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            
+            $item_type  = $item->endpoint;
+            $item_title = $item->title;
+            $payload    = $item->data;
+            
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($payload));
+            $res = curl_exec($ch);
+            sleep(1);
+            
+            if( curl_error($ch) )
+            {
+                $error = unindent(sprintf(
+                    $current_module->language->messages->cannot_post_to_telegram,
+                    $item_type, $item_title, curl_error($ch)
+                ));
+                
+                $config->globals["@autopush:sending_errors"][] = $error;
+                
+                if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                
+                curl_close($ch);
+                
+                continue;
+            }
+            
+            curl_close($ch);
+            
+            if( empty($res) )
+            {
+                $error = unindent(sprintf(
+                    $current_module->language->messages->empty_telegram_res,
+                    $item_type, $item_title
+                ));
+                
+                $config->globals["@autopush:sending_errors"][] = $error;
+                
+                if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                
+                continue;
+            }
+            
+            $obj = json_decode($res);
+            if( ! is_object($obj) )
+            {
+                $error = unindent(sprintf(
+                    $current_module->language->messages->unknown_telegram_res,
+                    $item_type, $item_title, print_r($res, true)
+                ));
+                
+                $config->globals["@autopush:sending_errors"][] = $error;
+                
+                if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                
+                continue;
+            }
+            
+            if( ! $obj->ok )
+            {
+                $error = unindent(sprintf(
+                    $current_module->language->messages->telegram_api_error_received,
+                    $item_type, $item_title, $obj->description
+                ));
+                
+                $config->globals["@autopush:sending_errors"][] = $error;
+                
+                if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                
+                continue;
+            }
+            
+            $config->globals["@autopush:messages_sent"]++;
+        }
+    }
+    
+    /**
      * @param post_record $post
      * @param string      $method as_link|as_pieces
      * 
@@ -529,7 +718,7 @@ class toolbox
         $config->globals["@autopush:messages_count"] = 1;
         
         if( $method == "as_link" ) return $post->get_permalink(true);
-    
+        
         if( ! class_exists('phpQuery') ) include_once ROOTPATH . "/lib/phpQuery-onefile.php";
         
         $config->globals["@autopush:paracollection"] = array();
@@ -544,9 +733,19 @@ class toolbox
         
         $pq->find('div.video_container')->each(function($e) {
             global $config;
+            static $media_repository = null;
+            if( is_null($media_repository) ) $media_repository = new media_repository();
             $_this   = pq($e);
             $item_id = $_this->find("video")->attr("data-id-media");
-            $_this->replaceWith("<p><video><source src='{$config->full_root_url}/media/{$item_id}'></video></p>");
+            $item    = $media_repository->get($item_id);
+            if( is_null($item) )
+            {
+                $_this->remove();
+            }
+            else
+            {
+                $_this->replaceWith("<p><video><source src='{$config->full_root_url}/data/uploaded_media/{$item->path}'></video></p>");
+            }
         });
         
         $pq->find("h1, h2, h3, h4, h5, h6")->each(function($e) {

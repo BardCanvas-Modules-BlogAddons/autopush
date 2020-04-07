@@ -42,7 +42,9 @@ $params = $config->globals["specs_renderer/autopush_control"];
                     ?>
                     <fieldset data-network="twitter">
                         <legend>
-                            <i class="autopush-icon twitter"></i> <?= $title ?>
+                            <i class="autopush-icon twitter"></i>
+                            <span class="pseudo_link clipboard-copy" data-clipboard-text="<?= $title ?>"
+                                  ><?= $title ?> <i class="fa fa-copy"></i></span>
                             <button onclick="remove_autopush_endpoint(this); return false;">
                                 <i class="fa fa-trash"></i>
                                 <?= $this_module->language->remove ?>
@@ -66,13 +68,15 @@ $params = $config->globals["specs_renderer/autopush_control"];
                 }
                 elseif( substr($line, 0, 8) == "discord:" )
                 {
-                    $line = substr($line, 9);
+                    $line  = substr($line, 9);
                     $parts = explode(", ", $line);
                     $title = array_shift($parts);
                     ?>
                     <fieldset data-network="discord">
                         <legend>
-                            <i class="autopush-icon discord"></i> <?= $title ?>
+                            <i class="autopush-icon discord"></i>
+                            <span class="pseudo_link clipboard-copy" data-clipboard-text="<?= $title ?>"
+                                  ><?= $title ?> <i class="fa fa-copy"></i></span>
                             <button onclick="remove_autopush_endpoint(this); return false;">
                                 <i class="fa fa-trash"></i>
                                 <?= $this_module->language->remove ?>
@@ -86,6 +90,39 @@ $params = $config->globals["specs_renderer/autopush_control"];
                                     <td width="100%">
                                         <input type="text" data-field="<?= $field ?>" value="<?= $parts[$key] ?>"
                                                placeholder="<?= $this_module->language->new->discord->fields->{$field}->placeholder ?>"
+                                               style="width: 100%" onblur="rebuild_autopush_endpoints()">
+                                    </td>
+                                </tr>
+                            <? endforeach; ?>
+                        </table>
+                    </fieldset>
+                    <?
+                }
+                elseif( substr($line, 0, 9) == "telegram:" )
+                {
+                    $line  = substr($line, 10);
+                    $parts = explode(", ", $line);
+                    $title = array_shift($parts);
+                    ?>
+                    <fieldset data-network="telegram">
+                        <legend>
+                            <i class="autopush-icon telegram"></i>
+                            <span class="pseudo_link clipboard-copy" data-clipboard-text="<?= $title ?>"
+                                  ><?= $title ?> <i class="fa fa-copy"></i></span>
+                            <button onclick="remove_autopush_endpoint(this); return false;">
+                                <i class="fa fa-trash"></i>
+                                <?= $this_module->language->remove ?>
+                            </button>
+                        </legend>
+                        <input type="hidden" data-field="title" value="<?= $title ?>">
+                        <table class="nav_table_inner">
+                            <? foreach(array("token", "target") as $key => $field):
+                                ?>
+                                <tr>
+                                    <th nowrap><?= $this_module->language->new->telegram->fields->{$field}->caption ?></th>
+                                    <td width="100%">
+                                        <input type="text" data-field="<?= $field ?>" value="<?= $parts[$key] ?>"
+                                               placeholder="<?= $this_module->language->new->telegram->fields->{$field}->placeholder ?>"
                                                style="width: 100%" onblur="rebuild_autopush_endpoints()">
                                     </td>
                                 </tr>

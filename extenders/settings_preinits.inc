@@ -32,6 +32,9 @@ use hng2_base\module;
     #autopush_endpoints_container .target fieldset[data-network="discord"]        { border-color: #7289da; background-color: #f0f2fb; }
     #autopush_endpoints_container .target fieldset[data-network="discord"] legend { color: #7289da; background-color: white;
                                                                                     border: 2px outset #7289da; border-radius: 5px; }
+    #autopush_endpoints_container .target fieldset[data-network="telegram"]        { border-color: #7289da; background-color: #f0f2fb; }
+    #autopush_endpoints_container .target fieldset[data-network="telegram"] legend { color: #0D86D7; background-color: white;
+                                                                                     border: 2px outset #0D86D7; border-radius: 5px; }
     
     #autopush_endpoints_container .target fieldset.new { box-shadow: 0 0 5px green; }
 </style>
@@ -91,6 +94,15 @@ use hng2_base\module;
                         $this.find('input[data-field="webhook"]').val().trim()
                     ));
                     break;
+                case 'telegram':
+                    options.push(sprintf(
+                        '%s: %s, %s, %s',
+                        network,
+                        $this.find('input[data-field="title"]').val().replace(/,:'"/, '').trim(),
+                        $this.find('input[data-field="token"]').val().trim(),
+                        $this.find('input[data-field="target"]').val().trim()
+                    ));
+                    break;
             }
         });
         
@@ -105,7 +117,6 @@ use hng2_base\module;
         <fieldset class="new" data-network="twitter">
             <legend>
                 <i class="autopush-icon twitter"></i>
-                <?= $this_module->language->new->twitter->legend ?>
                 <button onclick="$(this).closest('fieldset').hide('fast', function() { $(this).remove(); }); return false;">
                     <i class="fa fa-trash"></i>
                     <?= $this_module->language->remove ?>
@@ -142,6 +153,30 @@ use hng2_base\module;
                         <td width="100%">
                             <input type="text" data-field="<?= $field ?>"
                                    placeholder="<?= $this_module->language->new->discord->fields->{$field}->placeholder ?>"
+                                   style="width: 100%" onblur="rebuild_autopush_endpoints()">
+                        </td>
+                    </tr>
+                <? endforeach; ?>
+            </table>
+        </fieldset>
+    </template>
+    <template class="telegram">
+        <fieldset class="new" data-network="telegram">
+            <legend>
+                <i class="autopush-icon telegram"></i>
+                <?= $this_module->language->new->telegram->legend ?>
+                <button onclick="$(this).closest('fieldset').hide('fast', function() { $(this).remove(); }); return false;">
+                    <i class="fa fa-trash"></i>
+                    <?= $this_module->language->remove ?>
+                </button>
+            </legend>
+            <table class="nav_table_inner">
+                <? foreach(array("title", "token", "target") as $field): ?>
+                    <tr>
+                        <th nowrap><?= $this_module->language->new->telegram->fields->{$field}->caption ?></th>
+                        <td width="100%">
+                            <input type="text" data-field="<?= $field ?>"
+                                   placeholder="<?= $this_module->language->new->telegram->fields->{$field}->placeholder ?>"
                                    style="width: 100%" onblur="rebuild_autopush_endpoints()">
                         </td>
                     </tr>

@@ -66,6 +66,21 @@ foreach(explode("\n", $raw_endpoints) as $line)
         $endpoints["discord"][$slug]["title"]        = $parts[0];
         $endpoints["discord"][$slug]["webhook"]      = $parts[1];
     }
+    elseif( substr($line, 0, 9) == "telegram:" )
+    {
+        $line  = substr($line, 10);
+        $parts = explode(", ", $line);
+        
+        if( empty($parts[0]) ) continue;
+        if( empty($parts[1]) ) continue;
+        if( empty($parts[2]) ) continue;
+        
+        $slug  = wp_sanitize_filename($parts[0]);
+        
+        $endpoints["telegram"][$slug]["title"]       = $parts[0];
+        $endpoints["telegram"][$slug]["token"]       = $parts[1];
+        $endpoints["telegram"][$slug]["target"]      = $parts[2];
+    }
 }
 if( empty($endpoints) ) return;
 
