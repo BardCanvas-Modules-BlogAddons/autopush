@@ -78,6 +78,18 @@ if( empty($endpoints) ) return;
 if( empty($_POST["autopush_to"]) ) return;
 if( ! is_array($_POST["autopush_to"]) ) return;
 
+# Post visibility validations
+if( $post->visibility != "public" || $post->password != "" )
+{
+    send_notification($account->id_account, "warning", unindent($this_module->language->messages->post_not_public));
+    return;
+}
+if( $post->main_category_visibility != "public" || $post->main_category_min_level > 0 )
+{
+    send_notification($account->id_account, "warning", unindent($this_module->language->messages->post_category_not_public));
+    return;
+}
+
 #
 # Main loop
 #
