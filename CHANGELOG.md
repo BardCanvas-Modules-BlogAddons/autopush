@@ -1,12 +1,13 @@
 
 # Autopush Module Change Log
 
-## [Unreleased]
+## [1.3.0] - 2020-04-07
 
-- Minimal corrections.
 - Improvements on the settings editor.
 - Added post visibility validations.
 - Added support for Telegram.
+- Added support for automated push by other users.
+- Other minor corrections.
 
 ## [1.2.1] - 2019-07-01
 
