@@ -106,7 +106,7 @@ class toolbox
                 $title = $as_link_message;
             
             $type  = trim($current_module->language->post_types->link);
-            if( strlen($title) > 250 ) $title = make_excerpt_of($title, 250, false);
+            if( strlen($title) > 200 ) $title = make_excerpt_of($title, 200, false);
             $link  = $content;
             
             $data = array(
@@ -173,7 +173,7 @@ class toolbox
                     {
                         $error = unindent(sprintf(
                             $current_module->language->messages->invalid_image_type,
-                            $title, curl_error($ch)
+                            $url, curl_error($ch)
                         ));
                         
                         $config->globals["@autopush:sending_errors"][] = $error;
@@ -261,7 +261,7 @@ class toolbox
                 $type  = trim($current_module->language->post_types->message);
                 $title = make_excerpt_of($message);
                 
-                $data = array("status" => $message);
+                $data = array("status" => make_excerpt_of($message, 200));
                 if( ! empty($previous_tweet_id) )
                 {
                     $data["in_reply_to_status_id"] = $previous_tweet_id;
