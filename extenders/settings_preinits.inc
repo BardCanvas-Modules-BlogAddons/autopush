@@ -54,7 +54,11 @@ use hng2_base\module;
     {
         if( ! confirm($_GENERIC_CONFIRMATION) ) return;
         
-        $(trigger).closest('fieldset').hide('fast', function() { $(this).remove(); })
+        $(trigger).closest('fieldset').hide('fast', function()
+        {
+            $(this).remove();
+            rebuild_autopush_endpoints();
+        })
     }
     
     function rebuild_autopush_endpoints()
@@ -91,6 +95,7 @@ use hng2_base\module;
         });
         
         if( options.length > 0 ) $textarea.val(options.join('\n'));
+        else                     $textarea.val('');
     }
     
 </script>
