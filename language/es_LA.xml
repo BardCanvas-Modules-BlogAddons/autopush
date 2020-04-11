@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<language>
+    
+    <display_name>Autopush a redes sociales</display_name>
+    <icon>fa-paper-plane</icon>
+    <description><![CDATA[
+        Empuja entradas a redes sociales automáticamente tras publicarlas.
+    ]]></description>
+    
+    <add_selector>
+        <default>Añadir destino</default>
+        <option value="twitter">App de Twitter</option>
+        <option value="discord">Webhook de Discord</option>
+        <option value="telegram">Bot de Telegram</option>
+    </add_selector>
+    
+    <new>
+        <twitter>
+            <legend>Nueva aplicación de Twitter</legend>
+            <fields>
+                <title>
+                    <caption>Título:</caption>
+                    <placeholder>Identifica este destino (P.E. @usuario / nombre de app)</placeholder>
+                </title>
+                <consumer_key>
+                    <caption>Llave API:</caption>
+                    <placeholder>Llave del consumidor (pública)</placeholder>
+                </consumer_key>
+                <consumer_secret>
+                    <caption>Llave secreta:</caption>
+                    <placeholder>Llave secreta de la API</placeholder>
+                </consumer_secret>
+                <token>
+                    <caption>Llave del Token:</caption>
+                    <placeholder>Token de acceso</placeholder>
+                </token>
+                <token_secret>
+                    <caption>Secreto del Token:</caption>
+                    <placeholder>Llave secreta del token de acceso</placeholder>
+                </token_secret>
+            </fields>
+        </twitter>
+        <discord>
+            <legend>Nuevo Webhook de Discord</legend>
+            <fields>
+                <title>
+                    <caption>Título:</caption>
+                    <placeholder>Identifica este destino (P.E. servidor y canal)</placeholder>
+                </title>
+                <webhook>
+                    <caption>WebHook:</caption>
+                    <placeholder>Introduce la URL del Webhook</placeholder>
+                </webhook>
+            </fields>
+        </discord>
+        <telegram>
+            <legend>Nuevo destino de Telegram</legend>
+            <fields>
+                <title>
+                    <caption>Título:</caption>
+                    <placeholder>Identifica este destino (P.E. chat or canal)</placeholder>
+                </title>
+                <token>
+                    <caption>Token del bot:</caption>
+                    <placeholder>Introduce el token del bot</placeholder>
+                </token>
+                <target>
+                    <caption>Destino:</caption>
+                    <placeholder>@identificador</placeholder>
+                </target>
+            </fields>
+        </telegram>
+    </new>
+    
+    <remove>Remover</remove>
+    
+    <autopush_to_socnet>Empujar a redes sociales</autopush_to_socnet>
+    <push_as_link>Enviar un vínculo a la entrada</push_as_link>
+    <push_as_pieces>Enviar en segmentos - un mensaje por párrafo</push_as_pieces>
+    <link_message_placeholder>Escribe un mensaje para enviar con el vínculo a los destinos elegidos con este método</link_message_placeholder>
+    
+    <pushing_methods>
+        <as_link>vínculo</as_link>
+        <as_pieces>segmentos</as_pieces>
+    </pushing_methods>
+    
+    <aslink_info_dialog>
+        <title>Empujar entrada como vínculo</title>
+        <contents><![CDATA[
+            <p>
+                Este método es bastante simple:
+                la entrada se envía como vínculo, con un mensaje opcional (altamente recomendado).
+            </p>
+            <p>
+                <b>Advertencia:</b> asegúrate de que el mensaje es lo más corto posible para contener el vínculo.
+            </p>
+            <p>
+                Si el destino provee funcionalidad de "tarjetas", la tarjeta de la entrada se mostrará
+                (todos los tags SEO estarán colocados).<br>
+                Sólo asegúrate de que la entrada tenga una imagen principal para mostrar como miniatura.
+            </p>
+        ]]></contents>
+    </aslink_info_dialog>
+    
+    <aspieces_info_dialog>
+        <title>Empujar entrada en segmentos</title>
+        <contents><![CDATA[
+            <p>
+                Este método extrae encabezados y párrafos de los contenidos y los envía en
+                secuencia. Asegúrate de tomar en cuenta las siguientes consideraciones:
+            </p>
+            <ul>
+                <li>
+                    <b>Mantenlos cortos para Twitter.</b>
+                    Si la entrada tiene demasiados párrafos, no uses este método en Twitter
+                    <u>bajo ninguna circunstancia</u>.
+                    A Twitter no le gusta el spam, y puedes ocasionar una suspensión de tu aplicación
+                    o hasta de tu cuenta.
+                </li>
+                <li>
+                    <b>Mantenlos simples.</b>
+                    El parser de contenidos sólo extraerá encabezados de cualquier nivel y párrafos.
+                    <u>Todos los demás tipos de elementos serán descartados</u>, así que evita
+                    insertar bloques de frases, divs, párrafos preformateados, bloques de código,
+                    listas, etc.<br>
+                    <u>Estilos, vínculos, incrustaciones y otros elementos complejos
+                    serán removidos de cada párrafo</u>.
+                </li>
+                <li>
+                    <b>Añade imágenes o videos dentro de párrafos.</b>
+                    Si quieres subir imágenes o videos, deberás separarlos usando párrafos.
+                    Sólo asegúrate de añadir <u>una imagen o video por párrafo</u>.
+                </li>
+            </ul>
+        ]]></contents>
+    </aspieces_info_dialog>
+    
+    <post_types>
+        <link>vínculo</link>
+        <image>imagen</image>
+        <video>video</video>
+        <message>mensaje</message>
+    </post_types>
+    
+    <dialog>
+        <title>Empujar elemeto a redes sociales</title>
+        <url>
+            <caption>Vínculo a empujar:</caption>
+            <placeholder>Escribe o pega la URL a empujar</placeholder>
+        </url>
+    </dialog>
+    
+    <messages>
+        
+        <no_endpoints_defined><![CDATA[
+            Disculpa, pero no hay destinos de redes sociales definidos.
+        ]]></no_endpoints_defined>
+        
+        <missing_url>Por favor especifica una URL a empujar.</missing_url>
+        <invalid_url>Por favor especifica una URL completa.</invalid_url>
+        <no_endpoints_selected>Por favor selecciona aquellos destinos a los que deseas empujar la URL.</no_endpoints_selected>
+        
+        <invalid_endpoint><![CDATA[
+            Disculpa, pero el destino <span class="alternate">%s</span> no está registrado para empuje automático.
+        ]]></invalid_endpoint>
+        <invalid_method><![CDATA[
+            Disculpa, pero el método <code>%s</code> especificado para el destino <span class="alternate">%s</span> es inválido.
+        ]]></invalid_method>
+        <push_ok><![CDATA[
+            Entrada empujada con éxito a %s a través de <span class="alternate">%s</span>
+            (%s/%s mensajes enviados)
+        ]]></push_ok>
+        <pushed_info><![CDATA[
+            Enviado como  {$pushed_as} por {$sender} en {$date}.
+            Mensajes enviados: {$sent}/{$count}.
+        ]]></pushed_info>
+        
+        <empty_content><![CDATA[
+            Disculpa, pero no se han podido extraer los datos a empujar a %s a través de %s.
+        ]]></empty_content>
+        
+        <cannot_post_to_twitter><![CDATA[
+            No se ha podido postear %s "%s" en Twitter a través de %s:<br>
+            %s
+        ]]></cannot_post_to_twitter>
+        <empty_twitter_res><![CDATA[
+            No se ha recibido respuesta de Twitter al empujar el/la %s "%s".
+            No es posible saber si el mensaje fue admitido o no.
+        ]]></empty_twitter_res>
+        <unknown_twitter_res><![CDATA[
+            El/la %s "%s" se ha enviado pero la respuesta de Twitter no parece ser un objeto válido::
+            %s
+        ]]></unknown_twitter_res>
+        
+        <cannot_post_to_discord><![CDATA[
+            No se ha podido postear %s "%s" a Discord por un error de red:<br>
+            %s
+        ]]></cannot_post_to_discord>
+        <empty_discord_res><![CDATA[
+            No se ha recibido respuesta de Discord tras empujar el/la  %s "%s".
+            No es posible saber si el mensaje fue admitido o no.
+        ]]></empty_discord_res>
+        <unknown_discord_res><![CDATA[
+            El/la %s "%s" se ha enviado pero la respuesta de Discord no parece se un objeto válido:
+            %s
+        ]]></unknown_discord_res>
+        
+        <cannot_post_to_telegram><![CDATA[
+            No se ha podido postear %s "%s" a Telegram por un error de red:<br>
+            %s
+        ]]></cannot_post_to_telegram>
+        <empty_telegram_res><![CDATA[
+            No se ha recibido respuesta de Telegram tras empujar el/la  %s "%s".
+            No es posible saber si el mensaje fue admitido o no.
+        ]]></empty_telegram_res>
+        <unknown_telegram_res><![CDATA[
+            El/la %s "%s" se ha enviado pero la respuesta de Telegram no parece se un objeto válido:
+            %s
+        ]]></unknown_telegram_res>
+        <telegram_api_error_received><![CDATA[
+            Telegram ha retornado un error al postear el/la %s "%s":<br>
+            %s
+        ]]></telegram_api_error_received>
+        
+        <cannot_fetch_image><![CDATA[
+            Imposible descargar imagen "%s" debido a un error de red:<br>
+            %s<br>
+            Se omitirá la imagen.
+        ]]></cannot_fetch_image>
+        <invalid_image_type><![CDATA[
+            Disculpa, pero la imagen  "%s" no es un archivo JPEG/PNG/GIF válido. Se ha omitido.
+        ]]></invalid_image_type>
+        <image_is_empty><![CDATA[
+            La imagen "%s" está vacía. No se puede empujar. Se omitirá.
+        ]]></image_is_empty>
+        
+        <post_not_public><![CDATA[
+            Disculpa, pero esta entrada no se puede empujar a redes sociales
+            ya que no es pública.
+        ]]></post_not_public>
+        <post_category_not_public><![CDATA[
+            Disculpa, pero esta entrada no se puede empujar a redes sociales
+            porque la categoría principal no es public.
+        ]]></post_category_not_public>
+        
+    </messages>
+    
+    <single_post_actions>
+        <push>Empujar vínculo a...</push>
+    </single_post_actions>
+    
+    <settings_data>
+        <title>Autopush a redes sociales</title>
+        
+        <!--
+        Value format:
+        ┌───────────────────────────────────────────────────────────────────────────┐
+        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
+        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
+        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
+        │ discord: title, webhook_url                                               │
+        │ discord: title, webhook_url                                               │
+        │ discord: title, webhook_url                                               │
+        │ telegram: title, token, target                                            │
+        │ telegram: title, token, target                                            │
+        │ telegram: title, token, target                                            │
+        └───────────────────────────────────────────────────────────────────────────┘
+        -->
+        <specs key="endpoints">
+            <title>Destinos en redes sociales</title>
+            <description><![CDATA[
+                Especifica los destinos en redes sociales a los cuales deseas empujar entradas.
+                <span class="framed_content inlined pseudo_link state_ok"
+                      onclick="$('#autopush_endpoints_details').toggle()">
+                    Ver/ocultar detalles
+                </span>
+                
+                <div id="autopush_endpoints_details" style="display: none">
+                    <br>
+                    Este módulo soporta las siguientes redes sociales:
+                    <ul>
+                        <li>
+                            Twitter: una aplicación cliente debe ser creada en el sitio de
+                            <a href="https://developer.twitter.com" target="_blank">Desarrolladores de Twitter</a>
+                            y los siguientes detalles deben ser provistos para cada aplicación:
+                            <ul>
+                                <li>Llave púlbica de la API</li>
+                                <li>Llave secreta de la API</li>
+                                <li>Token de acceso</li>
+                                <li>Secreto del token de acceso</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Discord: por cada canal en tu servidor de Discord, necesitas crear un
+                            <a href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
+                               target="_blank">Webhook</a>
+                            y proveer la URL a cada webhook que deseas soportar.
+                        </li>
+                        <li>
+                            Telegram: necesitas crear un bot y obtener un token, entonces
+                            especificar los destinos a los cuales deseas empujar entradas
+                            (<code>@chat</code> o <code>@canal</code>).<br>
+                            <b>Nota:</b> necesitas añadir tu bot al chat o canal destino y darle privilegios para postear.<br>
+                            <a href="https://core.telegram.org/bots#3-how-do-i-create-a-bot" target="_blank">Da click aquí</a> para saber cómo crear un bot.
+                        </li>
+                    </ul>
+                    
+                    <span class="critical"><i class="fa fa-warning"></i> <b>Importante:</b></span>
+                    las opciones de empuje automático en el compositor de entradas están atadas al
+                    <span class="alternate">Nivel de usuario permitido para editar campos personalizados</span>
+                    en el grupo <span class="greengo">Interfaz</span> de la configuración de 
+                    <span class="greengo">Entradas (lectura y escritura)</span>.<br>
+                    Sólo usuarios con el nivel especificado o superior podrán empujar entradas
+                    a los destinos definidos aquí.
+                </div>
+            ]]></description>
+            <type>@autopush:specs_renderer/autopush_control</type>
+        </specs>
+        
+        <specs key="automated_push_directives">
+            <title>Directivas de autoempuje para usuarios regulares</title>
+            <description><![CDATA[
+                Si deseas empujar vínculos a entradas publicadas por usuarios regulares
+                (aquellos con un nivel inferior al requerido para editar campos personalizados),
+                especifica las directivas aquí.
+                <span class="framed_content inlined pseudo_link state_ok"
+                      onclick="$('#autopush_directives_details').toggle()">
+                    Ver/ocultar detalles
+                </span>
+                
+                <div id="autopush_directives_details" style="display: none">
+                    <br>
+                    Especifica una directiva por línea usando la siguiente sintaxis:
+                    
+                    <pre>red/canal: categorias|*
+red/canal: categorias|*
+red/canal: categorias|*</pre>
+                    
+                    PUedes especificar un <b>slug de categoría</b> o una <b>lista de slugs de categorías<b>
+                    <u>separadas por comas</u>.<br>
+                    Si especificas un asterisco en lugar de slugs de categorías, todas las categorías
+                    públicas serán incluídas. Ejemplos:
+                    
+                    <pre>Twitter/Mi canal de twitter: <b>noticias_de_usuarios, curiosidades</b>
+Telegram/Mi canal de Telegrm: <b>*</b>
+Discord/Canal novedades: <b>*</b>
+Discord/Canal noticias: <b>noticias_de_usuarios</b></pre>
+                    
+                    Si quieres desactivar temporalmente una directiva, añade un <code>#</code>
+                    al inicio de la línea.<br><br>
+                    
+                    <i class="fa fa-info-circle"></i> <b>Nota:</b>
+                    los mensajes y errores durante el envío no serán enviados
+                    al autor de la entrada. Estas se registrarán en el log "Autopush Submissions".
+                </div>
+            ]]></description>
+            <type>code</type>
+        </specs>
+        
+        <specs key="automated_push_caption">
+            <title>Leyenda para empuje automatizado</title>
+            <description><![CDATA[
+                Cuando se va a enviar un push automatizado usando las directivas anteriores,
+                se puede añadir un mensaje.
+                <span class="framed_content inlined pseudo_link state_ok"
+                      onclick="$('#autopush_autocaption_details').toggle()">
+                    Ver/ocultar detalles
+                </span>
+                
+                <div id="autopush_autocaption_details" style="display: none">
+                    <br>
+                    Usa la caja de texto para definir la leyenda a usar, P.E.:
+                    
+                    <pre>Juanito Pérez ha posteado un artículo!</pre>
+                    
+                    Opcionalmente, puedes añadir <code>{$user_name}</code> en donde desees que se
+                    inserte el nombre del autor y <code>{$category}</code> para insertar la
+                    categoría principal de la entrada, P.E.:
+                    
+                    <pre><code>{$user_name}</code> ha registrado un artículo en la categoría <code>{$category}</code>.</pre>
+                    
+                    Si no especificas una leyenda, se insertará un extracto de la entrada.
+                </div>
+            ]]></description>
+            <type>text</type>
+        </specs>
+        
+    </settings_data>
+    
+</language>
