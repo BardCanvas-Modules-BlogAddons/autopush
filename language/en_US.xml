@@ -241,6 +241,10 @@
         
     </messages>
     
+    <single_post_actions>
+        <push>Push link to...</push>
+    </single_post_actions>
+    
     <settings_data>
         <title>Autopushing</title>
         

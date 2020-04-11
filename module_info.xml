@@ -37,6 +37,9 @@
             <save_post>
                 <after_setting_metas>extenders/after_saving_post.inc</after_setting_metas>
             </save_post>
+            <front>
+                <single_post_actions>extenders/single_post_actions.inc</single_post_actions>
+            </front>
         </posts>
     </extends_to>
     
