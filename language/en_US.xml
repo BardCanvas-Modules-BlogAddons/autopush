@@ -243,6 +243,7 @@
     
     <single_post_actions>
         <push>Push link to...</push>
+        <log_title>Autopush log entries</log_title>
     </single_post_actions>
     
     <settings_data>

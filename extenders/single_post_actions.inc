@@ -23,6 +23,13 @@ if( $post->status != "published" ) return;
 if( $post->visibility != "public" ) return;
 if( ! empty($post->password) ) return;
 if( $post->main_category_visibility != "public" ) return;
+
+$metas = $post->fetch_all_metas();
+
+$pushed_log = array();
+foreach($metas as $key => $value)
+    if( substr($key, 0, 10) == "@autopush:" )
+        $pushed_log[] = $value;
 ?>
 
 <!-- Autopush button -->
@@ -41,8 +48,27 @@ if( $post->main_category_visibility != "public" ) return;
     }
 </style>
 
-<span class="item action autopush" onclick="open_autopush_element_dialog( '<?= $post->get_permalink(true) ?>' )">
-    <span class="fa fa-share-alt"></span>
-    <?= $this_module->language->single_post_actions->push ?>
-</span>
-
+<? if( empty($pushed_log) ): ?>
+    <span class="item action autopush" onclick="open_autopush_element_dialog( '<?= $post->get_permalink(true) ?>' )">
+        <span class="fa fa-share-alt"></span>
+        <?= $this_module->language->single_post_actions->push ?>
+    </span>
+<? else: ?>
+    <span class="nowrap">
+        <span class="item action autopush seamless_right"
+              onclick="open_autopush_element_dialog( '<?= $post->get_permalink(true) ?>' )">
+            <span class="fa fa-share-alt"></span>
+            <?= $this_module->language->single_post_actions->push ?>
+        </span><span class="item action autopush seamless_left"
+              title="<?= $this_module->language->single_post_actions->log_title ?>"
+              onclick="show_discardable_dialog('#autopush_log_entries')">
+            <i class="fa fa-file-text-o"></i>
+        </span>
+    </span>
+    <div id="autopush_log_entries" style="display: none"
+         title="<?= $this_module->language->single_post_actions->log_title ?>">
+        <ul>
+            <? foreach($pushed_log as $entry) echo "<li>$entry</li>\n"?>
+        </ul>
+    </div>
+<? endif; ?>
