@@ -31,9 +31,11 @@
             <editor_form>
                 <below_editor>extenders/post_form_extender.inc</below_editor>
             </editor_form>
+            <!--
             <quick_post_form>
                 <below_editor>extenders/post_form_extender.inc</below_editor>
             </quick_post_form>
+            -->
             <save_post>
                 <after_setting_metas>extenders/after_saving_post.inc</after_setting_metas>
             </save_post>
