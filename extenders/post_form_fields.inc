@@ -64,8 +64,12 @@ use hng2_base\template;
         ?>
     </div>
     <div id="autopush_link_message_area" style="display: none;">
-        <textarea name="autopush_link_message" style="width: 100%" rows="3" maxlength="250"
-                  placeholder="<?= $this_module->language->link_message_placeholder ?>"></textarea>
+        <textarea name="autopush_link_message" id="autopush_link_message"
+                  style="width: 100%" rows="3" maxlength="250"
+                  placeholder="<?= $this_module->language->link_message_placeholder ?>"
+                  data-link-placeholder="<?= $this_module->language->link_message_placeholder ?>"
+                  data-msg-placeholder="<?= $this_module->language->push_message->message_placeholder ?>"
+                  ></textarea>
     </div>
 </fieldset>
 

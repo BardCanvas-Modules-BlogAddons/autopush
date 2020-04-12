@@ -45,12 +45,15 @@ if( empty($endpoints) ) return;
 
 <div id="autopush_element_target" style="display: none"></div>
 
-<div id="autopush_element_dialog" style="display: none" title="<?= $this_module->language->dialog->title ?>"
+<div id="autopush_element_dialog" style="display: none"
+     title="<?= $this_module->language->dialog->title ?>"
+     data-link-title="<?= $this_module->language->dialog->title ?>"
+     data-msg-title="<?= $this_module->language->push_message->alt_dialog_title ?>"
      data-ok-caption="<?= $language->submit ?>" data-cancel-caption="<?= $language->cancel ?>">
     
     <form id="autopush_element_form" method="post" action="<?= $this_module->get_url() ?>/scripts/push_element.php">
         
-        <div class="field">
+        <div class="field" for="url">
             <div class="caption"><?= $this_module->language->dialog->url->caption ?></div>
             <div class="input">
                 <input type="text" name="url" placeholder="<?= $this_module->language->dialog->url->placeholder ?>">
@@ -70,8 +73,28 @@ if( empty($endpoints) ) return;
     
     function open_autopush_element_dialog(url)
     {
-        $('#autopush_element_form').find('input[name="url"]').val( url );
-        $('#autopush_element_dialog').dialog('open');
+        var $form     = $('#autopush_element_form');
+        var $dialog   = $('#autopush_element_dialog');
+        var $textarea = $('#autopush_link_message_area textarea[name="autopush_link_message"]');
+        var title, textarea_placeholder;
+        
+        if( url === 'message:override' )
+        {
+            $form.find('.field[for="url"]').hide();
+            title = $dialog.attr('data-msg-title');
+            textarea_placeholder = $textarea.attr('data-msg-placeholder');
+        }
+        else
+        {
+            $form.find('.field[for="url"]').show();
+            title = $dialog.attr('data-link-title');
+            textarea_placeholder = $textarea.attr('data-link-placeholder');
+        }
+        
+        $textarea.attr('placeholder', textarea_placeholder);
+        $form.find('input[name="url"]').val( url );
+        $dialog.dialog('option', 'title', title);
+        $dialog.dialog('open');
     }
     
     function autopush_element_prepare(data, $form)

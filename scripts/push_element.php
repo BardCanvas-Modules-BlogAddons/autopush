@@ -5,6 +5,11 @@
  * @package    BardCanvas
  * @subpackage Autopush
  * @author     Alejandro Caballero - lava.caballero@gmail.com
+ * 
+ * $_POST params:
+ * @param string url                   Either a fully qualified URL or "message:override" for pushing a message.
+ * @param array  autopush_to           Targets collection.
+ * @param string autopush_link_message Optional message for link. Mandatory if url is "message:override"
  */
 
 use hng2_modules\autopush\toolbox;
@@ -19,8 +24,13 @@ if( $account->level < $min_level ) throw_fake_401();
 
 # Initial prechecks
 $url = trim(stripslashes($_POST["url"]));
-if( empty($url) )                             die($current_module->language->messages->missing_url);
-if( ! filter_var($url, FILTER_VALIDATE_URL) ) die($current_module->language->messages->invalid_url);
+if( empty($url) ) die($current_module->language->messages->missing_url);
+
+if( $url == "message:override" && $account->level < $config::MODERATOR_USER_LEVEL )
+    die($current_module->language->push_message->only_mods_can_push_messages);
+elseif( $url != "message:override" && ! filter_var($url, FILTER_VALIDATE_URL) )
+    die($current_module->language->messages->invalid_url);
+
 if( empty($_POST["autopush_to"]) )            die($current_module->language->messages->no_endpoints_selected);
 if( ! is_array($_POST["autopush_to"]) )       die($current_module->language->messages->no_endpoints_selected);
 
@@ -116,7 +126,7 @@ foreach($_POST["autopush_to"] as $network => $slugs )
         
         # Some inits
         $title  = $endpoints[$network][$slug]["title"];
-        $method = $options["method"];
+        $method = $url == "message:override" ? "as_link" : $options["method"];
         
         # Method validation
         if( ! in_array($method, array("as_link", "as_pieces")) )

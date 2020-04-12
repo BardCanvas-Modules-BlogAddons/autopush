@@ -250,6 +250,13 @@
         <log_title>Bitácora de empujes</log_title>
     </single_post_actions>
     
+    <push_message>
+        <button_caption>Empujar mensaje a redes sociales</button_caption>
+        <alt_dialog_title>Empujar mensaje a redes sociales</alt_dialog_title>
+        <message_placeholder>Escribe un mensaje para enviar a los destinos elegidos</message_placeholder>
+        <only_mods_can_push_messages>Disculpa, pero sólo moderadores, editores yadministradores pueden empujar mensajes directos.</only_mods_can_push_messages>
+    </push_message>
+    
     <settings_data>
         <title>Autopush a redes sociales</title>
         

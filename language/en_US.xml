@@ -246,6 +246,13 @@
         <log_title>Autopush log entries</log_title>
     </single_post_actions>
     
+    <push_message>
+        <button_caption>Push message to social networks</button_caption>
+        <alt_dialog_title>Push message to social networks</alt_dialog_title>
+        <message_placeholder>Type a message to send to the selected endpoints</message_placeholder>
+        <only_mods_can_push_messages>Sorry, but only moderators, editors and admins can push direct messages.</only_mods_can_push_messages>
+    </push_message>
+    
     <settings_data>
         <title>Autopushing</title>
         

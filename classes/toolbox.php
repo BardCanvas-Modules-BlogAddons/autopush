@@ -26,7 +26,7 @@ class toolbox
      * @param string             $network
      * @param string             $method          as_link|as_pieces
      * @param array              $endpoint_data
-     * @param post_record|string $pushing_element Post record or ULR being pushed
+     * @param post_record|string $pushing_element Post record or ULR being pushed or "message:override"
      * @param account            $sender
      * @param bool               $notify_errors   If true, errors will be notified to the sender.
      *                                            If false, errors will be logged on $config->globals["@autopush:sending_errors"]
@@ -77,7 +77,7 @@ class toolbox
     /**
      * @param string             $method               as_link | as_pieces
      * @param array              $endpoint_data        [title, api_key, api_secret, token_key, token_secret]
-     * @param post_record|string $pushing_element      Post record or URL being pushed
+     * @param post_record|string $pushing_element      Post record or URL being pushed or "message:override"
      * @param int|bool           $notifications_target Account id to notify or false for no notifications
      * @param string             $as_link_message      Message to send with the link (if the method is "as_link".
      */
@@ -88,6 +88,7 @@ class toolbox
         
         if( is_string($pushing_element) ) $content = $pushing_element;
         else                              $content = $this->get_processed_content($pushing_element, $method);
+        
         if( empty($content) )
         {
             $error = unindent(sprintf(
@@ -116,9 +117,11 @@ class toolbox
             else
                 $title = $as_link_message;
             
-            $type  = trim($current_module->language->post_types->link);
+            $type  = $content == "message:override"
+                   ? trim($current_module->language->post_types->message)
+                   : trim($current_module->language->post_types->link);
             if( strlen($title) > 200 ) $title = make_excerpt_of($title, 200, false);
-            $link  = $content;
+            $link  = $content == "message:override" ? "" : $content;
             
             $data = array(
                 "status" => trim("$title $link")
@@ -366,7 +369,7 @@ class toolbox
     /**
      * @param string      $method               as_link|as_pieces
      * @param array       $endpoint_data        [title, webhook]
-     * @param post_record $pushing_element      Post record or URL to post
+     * @param post_record $pushing_element      Post record or URL to post or "message:override"
      * @param int|bool    $notifications_target Account id to notify or false for no notifications
      * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
      */
@@ -386,7 +389,7 @@ class toolbox
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         
         if( is_string($pushing_element) ) $content = $pushing_element;
-        else                              $content  = $this->get_processed_content($pushing_element, $method);
+        else                              $content = $this->get_processed_content($pushing_element, $method);
         
         if( empty($content) )
         {
@@ -410,10 +413,13 @@ class toolbox
             else
                 $title = $as_link_message;
             
-            $link  = $content;
+            $link = $content == "message:override" ? "" : $content;
+            $type = $content == "message:override"
+                  ? trim($current_module->language->post_types->message)
+                  : trim($current_module->language->post_types->link);
             
             $payloads[] = (object) array(
-                "type"  => trim($current_module->language->post_types->link),
+                "type"  => $type,
                 "title" => make_excerpt_of($link),
                 "data"  => array(
                     "content" => trim($title . "\n" . $link)
@@ -530,7 +536,7 @@ class toolbox
     /**
      * @param string      $method               as_link|as_pieces
      * @param array       $endpoint_data        [title, token, target]
-     * @param post_record $pushing_element      Post record or URL to post
+     * @param post_record $pushing_element      Post record or URL to post or "message:override"
      * @param int|bool    $notifications_target Account id to notify or false for no notifications
      * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
      */
@@ -566,13 +572,16 @@ class toolbox
                 $title = $as_link_message;
             
             $caption = str_replace(array("http://", "https://", "www."), "", make_excerpt_of($content, 50));
+            $s_text  = $content == "message:override"
+                     ? $as_link_message
+                     : sprintf('%s <a href="%s">%s</a>', $title, $content, $caption);
             
             $payloads[] = (object) array(
                 "endpoint" => "sendMessage",
                 "title"    => $title,
                 "data" => array(
                     "chat_id"    => $endpoint_data["target"],
-                    "text"       => sprintf('%s <a href="%s">%s</a>', $title, $content, $caption),
+                    "text"       => $s_text,
                     "parse_mode" => "HTML",
                 )
             );
