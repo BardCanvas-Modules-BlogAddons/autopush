@@ -385,6 +385,18 @@ Discord/My Discord channel 2: <b>user_news</b></pre>
             <type>text</type>
         </specs>
         
+        <specs key="automated_push_limits">
+            <title>Automated push limits</title>
+            <description><![CDATA[
+                If automated push directives are defined, you can set
+                pushing limits per user level, one level per line, using the next syntax:
+                <pre>user_level: pushes_per_hour
+user_level: pushes_per_hour
+...</pre>
+            ]]></description>
+            <type>code</type>
+        </specs>
+        
     </settings_data>
     
 </language>

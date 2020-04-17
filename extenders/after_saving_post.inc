@@ -94,6 +94,11 @@ if( empty($endpoints) ) return;
 $notifications_target = "current_user";
 $cats_repo = new categories_repository();
 
+$logfile = sprintf("%s/autopush_submissions-%s.log", $config->logfiles_location, date("Ymd"));
+cli_colortags::$output_file = $logfile;
+cli_colortags::$output_to_file_only = true;
+
+$updating_account = null;
 $min_level = (int) $settings->get("modules:posts.level_allowed_to_edit_custom_fields");
 if( empty($min_level) ) $min_level = $config::MODERATOR_USER_LEVEL;
 if( $account->level < $min_level )
@@ -155,6 +160,54 @@ if( $account->level < $min_level )
     
     if( ! $allow_pushing ) return;
     
+    $raw_limits = $settings->get("modules:autopush.automated_push_limits");
+    if( ! empty($raw_limits) )
+    {
+        $per_level_limits = array();
+        foreach(explode("\n", $raw_limits) as $line)
+        {
+            $line = trim($line);
+            
+            if( empty($line) ) continue;
+            if( substr($line, 0, 1) == "#" ) continue;
+            
+            $parts = explode(":", $line);
+            
+            if( count($parts) != 2 ) continue;
+            if( ! is_numeric($parts[0]) ) continue;
+            if( ! is_numeric($parts[1]) ) continue;
+            if( $parts[0] < 0 ) continue;
+            if( $parts[0] >= $config::MODERATOR_USER_LEVEL ) continue;
+            
+            $per_level_limits[trim($parts[0])] = trim($parts[1]);
+        }
+        
+        if(
+            isset($per_level_limits[$account->level])
+            && ! empty($account->engine_prefs["@autopush:last_automated_submission_date"])
+        ) {
+            $hours      = $per_level_limits[$account->level];
+            $boundary   = strtotime("now - $hours hours");
+            $last_pdate = strtotime($account->engine_prefs["@autopush:last_automated_submission_date"]);
+            
+            if( $last_pdate >= $boundary )
+            {
+                cli_colortags::write(sprintf(
+                    "<purple>[%s] %s's attempt to autopush discarded: %s hours limit in place (last push date: %s ~ %s).</purple>\n",
+                    date("Y-m-d H:i:s"),
+                    $account->display_name,
+                    $hours,
+                    date("Y-m-d H:i:s", strtotime($last_pdate)),
+                    time_elapsed_string(date("Y-m-d H:i:s", strtotime($last_pdate)))
+                ));
+                
+                return;
+            }
+            
+            $updating_account = $account;
+        }
+    }
+    
     $notifications_target = "logfile";
     
     $auto_caption = $settings->get("modules:autopush.automated_push_caption");
@@ -202,10 +255,6 @@ if( $post->main_category_visibility != "public" || $post->main_category_min_leve
 #
 # Main loop
 #
-
-$logfile = sprintf("%s/autopush_submissions-%s.log", $config->logfiles_location, date("Ymd"));
-cli_colortags::$output_file = $logfile;
-cli_colortags::$output_to_file_only = true;
 
 $post_meta = null;
 if( ! is_null($old_post) )
@@ -289,6 +338,9 @@ foreach($_POST["autopush_to"] as $network => $slugs )
         
         if( ! empty($config->globals["@autopush:sending_errors"]) )
         {
+            if( ! is_null($updating_account) )
+                $updating_account->set_engine_pref("@autopush:last_automated_submission_date", date("Y-m-d H:i:s"));
+            
             if( $notifications_target == "user" ) continue;
             
             cli_colortags::write(sprintf(

@@ -393,6 +393,18 @@ Discord/Canal noticias: <b>noticias_de_usuarios</b></pre>
             <type>text</type>
         </specs>
         
+        <specs key="automated_push_limits">
+            <title>Límites para empuje automatizado</title>
+            <description><![CDATA[
+                Si has definido directivas de autoempuje, puedes especificar los límites de envío
+                por nivel de usuario, un nivel por fila, usando la siguiente sintaxis:
+                <pre>nivel_de_usuario: mensajes_por_hora
+nivel_de_usuario: mensajes_por_hora
+...</pre>
+            ]]></description>
+            <type>code</type>
+        </specs>
+        
     </settings_data>
     
 </language>
