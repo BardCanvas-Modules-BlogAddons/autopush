@@ -369,7 +369,7 @@ Discord/Canal noticias: <b>noticias_de_usuarios</b></pre>
             <title>Leyenda para empuje automatizado</title>
             <description><![CDATA[
                 Cuando se va a enviar un push automatizado usando las directivas anteriores,
-                se puede añadir un mensaje.
+                se puede añadir un mensaje global o por categoría.
                 <span class="framed_content inlined pseudo_link state_ok"
                       onclick="$('#autopush_autocaption_details').toggle()">
                     Ver/ocultar detalles
@@ -387,10 +387,29 @@ Discord/Canal noticias: <b>noticias_de_usuarios</b></pre>
                     
                     <pre><code>{$user_name}</code> ha registrado un artículo en la categoría <code>{$category}</code>.</pre>
                     
-                    Si no especificas una leyenda, se insertará un extracto de la entrada.
+                    Si no especificas una leyenda, se insertará un extracto de la entrada.<br><br>
+                    
+                    <b>Usando un mensaje por categoría</b><br><br>
+                    
+                    Si deseas usar un mensaje diferente para ciertas categorías, necesitas especificar
+                    todos los mensajes basados en categoría <u>primero</u> y uno o más mensajes globales
+                    después, usando la siguiente sintaxis:
+                    
+                    <pre>@slug_de_categoria: mensaje
+@slug_de_categoria: mensaje
+@slug_de_categoria: mensaje
+mensaje global 1
+mensaje global n</pre>
+                    
+                    <b>Importante:</b> usa una línea por mensaje, un mensaje por categoría, y recuerda
+                    prefijar una <code>@</code> al slug de la categoría.<br>
+                    Puedes definir cuantos mensajes globales desees, el sistema eligirá uno al azar.<br><br>
+                    
+                    Si quieres sólo especificar múltiples mensajes para que el sistema elija uno al azar,
+                    puedes omitir los mensajes por categoría por completo y sólo especificar globales.
                 </div>
             ]]></description>
-            <type>text</type>
+            <type>code</type>
         </specs>
         
         <specs key="automated_push_limits">

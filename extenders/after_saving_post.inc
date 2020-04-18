@@ -222,6 +222,31 @@ if( $account->level < $min_level )
         $post_author   = new account($post->id_author);
         $post_category = $cats_repo->get($post->main_category);
         
+        $per_category_autocaptions = array();
+        $global_autocaptions       = array();
+        foreach(explode("\n", $auto_caption) as $line)
+        {
+            $line = trim($line);
+            if( empty($line) ) continue;
+            if( substr($line, 0, 1) == "#" ) continue;
+            
+            if( substr($line, 0, 1) != "@" )
+            {
+                $global_autocaptions[] = trim($line);
+            }
+            elseif( preg_match('/^@([a-z0-9\-_.]+):\s+(.*)$/', $line, $matches) )
+            {
+                $per_category_autocaptions[$matches[1]] = trim($matches[2]);
+            }
+        }
+        
+        if( isset($per_category_autocaptions[$post_category->slug]) )
+            $auto_caption = $per_category_autocaptions[$post_category->slug];
+        elseif( ! empty($global_autocaptions) )
+            $auto_caption = $global_autocaptions[array_rand($global_autocaptions)];
+        else
+            $auto_caption = strip_tags($post->title);
+            
         $_POST["autopush_link_message"] = replace_escaped_objects($auto_caption, array(
             '{$user_name}' => $post_author->display_name,
             '{$category}'  => $post_category->title,
