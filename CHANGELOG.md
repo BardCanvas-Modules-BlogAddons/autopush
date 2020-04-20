@@ -1,6 +1,16 @@
 
 # Autopush Module Change Log
 
+## [1.4.0] - 2020-04-20
+
+- Added "Push to" button on single post actions.
+- Added Spanish translation.
+- Added Message pushing from the main menu (mods/admins only).
+- Removed autopush controls on the quick post form
+  (it conflicts with message pushing from the main menu).
+- Added automated push per-user-level limits.
+- Added automated push multiple per-category/fallback messages.
+
 ## [1.3.0] - 2020-04-07
 
 - Improvements on the settings editor.
