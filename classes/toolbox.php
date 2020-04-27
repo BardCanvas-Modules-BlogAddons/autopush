@@ -478,11 +478,16 @@ class toolbox
         
         foreach($payloads as $item)
         {
-            $item_type  = $item->type;
-            $item_title = $item->title;
-            $payload    = $item->data;
+            $item_type   = $item->type;
+            $item_title  = $item->title;
+            $payload     = $item->data;
+            $post_string = json_encode($payload);
             
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                "Content-Type: application/json; charset=UTF-8",
+                "Content-Length: " . strlen($post_string)
+            ));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);
             $res = curl_exec($ch);
             sleep(1);
             
