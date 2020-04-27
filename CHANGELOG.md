@@ -1,6 +1,10 @@
 
 # Autopush Module Change Log
 
+## [1.4.1] - 2020-04-27
+
+- Added POST headers recently required by Discord.
+
 ## [1.4.0] - 2020-04-20
 
 - Added "Push to" button on single post actions.
