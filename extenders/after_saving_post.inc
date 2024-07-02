@@ -84,6 +84,36 @@ foreach(explode("\n", $raw_endpoints) as $line)
         $endpoints["telegram"][$slug]["token"]       = $parts[1];
         $endpoints["telegram"][$slug]["target"]      = $parts[2];
     }
+    elseif( substr($line, 0, 17) == "linkedin_profile:" )
+    {
+        $line  = substr($line, 18);
+        $parts = explode(", ", $line);
+        
+        if( empty($parts[0]) ) continue;
+        if( empty($parts[1]) ) continue;
+        if( empty($parts[2]) ) continue;
+        
+        $slug  = wp_sanitize_filename($parts[0]);
+        
+        $endpoints["linkedin_profile"][$slug]["title"]  = $parts[0];
+        $endpoints["linkedin_profile"][$slug]["token"]  = $parts[1];
+        $endpoints["linkedin_profile"][$slug]["target"] = $parts[2];
+    }
+    elseif( substr($line, 0, 17) == "linkedin_company:" )
+    {
+        $line  = substr($line, 18);
+        $parts = explode(", ", $line);
+        
+        if( empty($parts[0]) ) continue;
+        if( empty($parts[1]) ) continue;
+        if( empty($parts[2]) ) continue;
+        
+        $slug  = wp_sanitize_filename($parts[0]);
+        
+        $endpoints["linkedin_company"][$slug]["title"]  = $parts[0];
+        $endpoints["linkedin_company"][$slug]["token"]  = $parts[1];
+        $endpoints["linkedin_company"][$slug]["target"] = $parts[2];
+    }
 }
 if( empty($endpoints) ) return;
 
@@ -263,7 +293,7 @@ if( ! is_array($_POST["autopush_to"]) ) return;
 # If automated push directives are green (normal user), mods/admins aren't notified to avoid spam.
 if( $post->visibility != "public" || $post->password != "" )
 {
-    if( $notifications_target == "user" ) send_notification(
+    if( $notifications_target == "current_user" ) send_notification(
         $account->id_account, "warning", unindent($this_module->language->messages->post_not_public)
     );
     
@@ -271,14 +301,14 @@ if( $post->visibility != "public" || $post->password != "" )
 }
 if( $post->main_category_visibility != "public" || $post->main_category_min_level > 0 )
 {
-    if( $notifications_target == "user" ) send_notification(
+    if( $notifications_target == "current_user" ) send_notification(
         $account->id_account, "warning", unindent($this_module->language->messages->post_category_not_public)
     );
     return;
 }
 
 #
-# Main loop
+# Main loop - All validations passed
 #
 
 $post_meta = null;
@@ -298,7 +328,7 @@ foreach($_POST["autopush_to"] as $network => $slugs )
         # Endpoint validations
         if( ! isset($endpoints[$network][$slug]) )
         {
-            if( $notifications_target == "user" ) send_notification(
+            if( $notifications_target == "current_user" ) send_notification(
                 $account->id_account,
                 "warning",
                 sprintf($this_module->language->messages->invalid_endpoint, $slug)
@@ -317,7 +347,7 @@ foreach($_POST["autopush_to"] as $network => $slugs )
         # Method validation
         if( ! in_array($method, array("as_link", "as_pieces")) )
         {
-            if( $notifications_target == "user" ) send_notification(
+            if( $notifications_target == "current_user" ) send_notification(
                 $account->id_account,
                 "warning",
                 sprintf($this_module->language->messages->invalid_method, $method, $title)
@@ -335,7 +365,7 @@ foreach($_POST["autopush_to"] as $network => $slugs )
         if(
             is_array($post_meta)
             && isset($post_meta["@autopush:$network.last_push"])
-            && $notifications_target != "user"
+            && $notifications_target != "current_user"
         ) {
             cli_colortags::write(sprintf(
                 "<purple>[%s] Already pushed to %s/%s:</purple>\n" .
@@ -366,7 +396,7 @@ foreach($_POST["autopush_to"] as $network => $slugs )
             if( ! is_null($updating_account) )
                 $updating_account->set_engine_pref("@autopush:last_automated_submission_date", date("Y-m-d H:i:s"));
             
-            if( $notifications_target == "user" ) continue;
+            if( $notifications_target == "current_user" ) continue;
             
             cli_colortags::write(sprintf(
                 "<light_red>[%s] Errors attempting automated push to %s/%s:</light_red>\n" .
@@ -396,7 +426,7 @@ foreach($_POST["autopush_to"] as $network => $slugs )
             $config->globals["@autopush:messages_count"]
         ));
         
-        if( $notifications_target == "user" )
+        if( $notifications_target == "current_user" )
         {
             send_notification($account->id_account, "success", $notification);
         }

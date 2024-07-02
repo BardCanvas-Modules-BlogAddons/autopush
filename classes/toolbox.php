@@ -8,6 +8,7 @@ use hng2_base\module;
 use hng2_media\media_repository;
 use hng2_modules\posts\post_record;
 use Abraham\TwitterOAuth\TwitterOAuth;
+use hng2_modules\posts\posts_repository;
 use phpQuery;
 
 class toolbox
@@ -56,11 +57,17 @@ class toolbox
             case "telegram":
                 $this->post_to_telegram($method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
                 break;
+            case "linkedin_profile":
+                $this->post_to_linkedin("profile", $method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
+                break;
+            case "linkedin_company":
+                $this->post_to_linkedin("company", $method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message);
+                break;
         }
         
         if( $config->globals["@autopush:messages_sent"] == 0 ) return;
         
-        $message     = unindent(replace_escaped_objects(
+        $message = unindent(replace_escaped_objects(
             $current_module->language->messages->pushed_info, array(
                 '{$pushed_as}' => $current_module->language->pushing_methods->{$method},
                 '{$sender}'    => $sender->get_processed_display_name(),
@@ -76,7 +83,13 @@ class toolbox
     
     /**
      * @param string             $method               as_link | as_pieces
-     * @param array              $endpoint_data        [title, api_key, api_secret, token_key, token_secret]
+     * @param array              $endpoint_data        = [
+     *                                                       "title" => "string",
+     *                                                       "api_key" => "string",
+     *                                                       "api_secret" => "string",
+     *                                                       "token_key" => "string",
+     *                                                       "token_secret" => "string
+     *                                                   ]
      * @param post_record|string $pushing_element      Post record or URL being pushed or "message:override"
      * @param int|bool           $notifications_target Account id to notify or false for no notifications
      * @param string             $as_link_message      Message to send with the link (if the method is "as_link".
@@ -124,11 +137,11 @@ class toolbox
             $link  = $content == "message:override" ? "" : $content;
             
             $data = array(
-                "status" => trim("$title $link")
+                "text" => trim("$title $link")
             );
             
             $res = $this->tweet(
-                $connection, "statuses/update", $data, $type, $title, $endpoint_data, $notifications_target
+                $connection, "tweets", $data, $type, $title, $endpoint_data, $notifications_target
             );
             
             if( $res ) $config->globals["@autopush:messages_sent"]++;
@@ -228,15 +241,15 @@ class toolbox
                 
                 $media_id = $res->media_id_string;
                 
-                $data = array("status" => $title, "media_ids" => $media_id);
+                $data = array("text" => $title, "media_ids" => $media_id);
                 if( ! empty($previous_tweet_id) )
                 {
-                    $data["in_reply_to_status_id"] = $previous_tweet_id;
-                    $data["status"] = "@{$tweet_author_handle} {$data["status"]}";
+                    $data["reply"]["in_reply_to_tweet_id"] = $previous_tweet_id;
+                    $data["text"] = "@{$tweet_author_handle} {$data["text"]}";
                 }
                 
                 $res = $this->tweet(
-                    $connection, "statuses/update", $data, $type, $title, $endpoint_data, $notifications_target
+                    $connection, "tweets", $data, $type, $title, $endpoint_data, $notifications_target
                 );
                 
                 if( $res )
@@ -252,15 +265,15 @@ class toolbox
                 $message = str_replace("<video>", "", $message);
                 $title   = basename($message);
                 
-                $data = array("status" => $message);
+                $data = array("text" => $message);
                 if( ! empty($previous_tweet_id) )
                 {
-                    $data["in_reply_to_status_id"] = $previous_tweet_id;
-                    $data["status"] = "@{$tweet_author_handle} {$data["status"]}";
+                    $data["reply"]["in_reply_to_tweet_id"] = $previous_tweet_id;
+                    $data["text"] = "@{$tweet_author_handle} {$data["text"]}";
                 }
                 
                 $res = $this->tweet(
-                    $connection, "statuses/update", $data, $type, $title, $endpoint_data, $notifications_target
+                    $connection, "tweet", $data, $type, $title, $endpoint_data, $notifications_target
                 );
                 
                 if( $res )
@@ -275,15 +288,15 @@ class toolbox
                 $type  = trim($current_module->language->post_types->message);
                 $title = make_excerpt_of($message);
                 
-                $data = array("status" => make_excerpt_of($message, 200));
+                $data = array("text" => make_excerpt_of($message, 200));
                 if( ! empty($previous_tweet_id) )
                 {
-                    $data["in_reply_to_status_id"] = $previous_tweet_id;
-                    $data["status"] = "@{$tweet_author_handle} {$data["status"]}";
+                    $data["reply"]["in_reply_to_tweet_id"] = $previous_tweet_id;
+                    $data["text"] = "@{$tweet_author_handle} {$data["text"]}";
                 }
                 
                 $res = $this->tweet(
-                    $connection, "statuses/update", $data, $type, $title, $endpoint_data, $notifications_target
+                    $connection, "tweet", $data, $type, $title, $endpoint_data, $notifications_target
                 );
                 
                 if( $res )
@@ -302,7 +315,13 @@ class toolbox
      * @param array        $data
      * @param string       $type
      * @param string       $title
-     * @param array        $endpoint_data        [title, consumer_key, consumer_secret, token, token_secret]
+     * @param array        $endpoint_data        = [
+     *                                                 "title" => "string",
+     *                                                 "consumer_key" => "string",
+     *                                                 "consumer_secret" => "string",
+     *                                                 "token" => "string",
+     *                                                 "token_secret" => "string"
+     *                                             ]
      * @param int|bool     $notifications_target Account id to notify or false for no notifications
      * 
      * @return object|bool
@@ -315,7 +334,7 @@ class toolbox
         if( $twitter_method == "media/upload" )
             $res = $connection->upload($twitter_method, $data);
         else
-            $res = $connection->post($twitter_method, $data);
+            $res = $connection->post($twitter_method, $data, true);
         sleep( 1 );
         
         if( empty($res) )
@@ -346,14 +365,14 @@ class toolbox
             return false;
         }
         
-        if( $res->errors )
+        if( empty($res->data) )
         {
-            $code    = $res->errors[0]->code;
-            $message = $res->errors[0]->message;
+            $code    = $res->status;
+            $message = "$res->title: $res->detail";
             
             $error = unindent(sprintf(
                 $current_module->language->messages->cannot_post_to_twitter,
-                $type, $title, $endpoint_data["title"], "$code $message"
+                $type, $title, $endpoint_data["title"], "[{$code}] {$message}"
             ));
             
             $config->globals["@autopush:sending_errors"][] = $error;
@@ -368,7 +387,7 @@ class toolbox
     
     /**
      * @param string      $method               as_link|as_pieces
-     * @param array       $endpoint_data        [title, webhook]
+     * @param array       $endpoint_data        = ["title" => "string", "webhook" => "url"]
      * @param post_record $pushing_element      Post record or URL to post or "message:override"
      * @param int|bool    $notifications_target Account id to notify or false for no notifications
      * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
@@ -540,7 +559,7 @@ class toolbox
     
     /**
      * @param string      $method               as_link|as_pieces
-     * @param array       $endpoint_data        [title, token, target]
+     * @param array       $endpoint_data        = ["title" => "string", "token" => "string", "target" => "string"]
      * @param post_record $pushing_element      Post record or URL to post or "message:override"
      * @param int|bool    $notifications_target Account id to notify or false for no notifications
      * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
@@ -722,6 +741,315 @@ class toolbox
     }
     
     /**
+     * @param string      $endpoint_type        profile | company
+     * @param string      $method               as_link is the only method accepted
+     * @param array       $endpoint_data        = ["title" => "string", "token" => "string", "target" => "string"]
+     * @param post_record $pushing_element      Post record or URL to post or "message:override"
+     * @param int|bool    $notifications_target Account id to notify or false for no notifications
+     * @param string      $as_link_message      Message to send with the link (if the method is "as_link".
+     */
+    private function post_to_linkedin($endpoint_type, $method, $endpoint_data, $pushing_element, $notifications_target, $as_link_message)
+    {
+        global $modules, $config, $settings;
+        
+        $current_module = $modules["autopush"];
+    
+        if( ! is_object($pushing_element) )
+            $title = $as_link_message;
+        else
+            $title = empty($as_link_message) ? $pushing_element->get_processed_excerpt(true) : $as_link_message;
+        
+        if( is_string($pushing_element) && $pushing_element == "message:override" )     $item_type = "message";
+        elseif( is_string($pushing_element) && $pushing_element != "message:override" ) $item_type = "link";
+        else                                                                            $item_type = "post";
+        
+        $encryption_key  = "bfxFUbgQbQ7QNCmVaK";
+        $decrypted_token = decrypt($endpoint_data["token"], $encryption_key);
+        list($token_string, $token_expiration) = explode("\t", $decrypted_token);
+        
+        if( ! is_numeric($token_expiration) )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->malformed_linkedin_token,
+                $item_type, $title, $endpoint_data["title"]
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        $now  = date("Y-m-d H:i:s");
+        $then = date("Y-m-d H:i:s", $token_expiration);
+        
+        if( $now > $then )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->linkedin_token_expired,
+                $item_type, $title, $endpoint_data["title"]
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        $decrypted_res   = decrypt($endpoint_data["target"], $encryption_key);
+        $resource_parts  = explode("\t", $decrypted_res);
+        
+        if( count($resource_parts) < 1 || count($resource_parts) > 2 )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->malformed_linkedin_resource_id,
+                $item_type, $title, $endpoint_data["title"]
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        if( ! preg_match('/^user:(.+),(.+)$/', $resource_parts[0], $matches) )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->invalid_linkedin_profile_id,
+                $item_type, $title, $endpoint_data["title"]
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        $res_user_id   = $matches[1];
+        $res_user_name = $matches[2];
+        
+        $res_comp_id   = "";
+        $res_comp_name = "";
+        if( $endpoint_type == "company" )
+        {
+            if( ! preg_match('/^company:(.+),(.+)$/', $resource_parts[1], $matches) )
+            {
+                $error = unindent(sprintf(
+                    $current_module->language->messages->invalid_linkedin_company_id,
+                    $item_type, $title, $endpoint_data["title"], $res_user_name
+                ));
+                
+                $config->globals["@autopush:sending_errors"][] = $error;
+                
+                if( $notifications_target ) send_notification($notifications_target, "error", $error);
+                
+                return;
+            }
+            
+            $res_comp_id   = $matches[1];
+            $res_comp_name = $matches[2];
+        }
+        
+        $resource_urn  = $endpoint_type == "profile" ? "urn:li:person:$res_user_id" : "urn:li:organization:$res_comp_id";
+        $resource_name = $endpoint_type == "profile" ? $res_user_name : "$res_user_name » $res_comp_name";
+        
+        if( $method != "as_link" )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->as_link_only, "{$endpoint_data['title']} ($resource_name)"
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        $item = (object) array(
+            "type"     => $item_type,
+            "endpoint" => "v2/shares",
+            "title"    => $title,
+            "data"     => null,
+            "headers"  => array(
+                "Authorization: Bearer {$token_string}", 
+                "Content-type: application/json", 
+                "x-li-format: json"
+            )
+        );
+        
+        if( is_string($pushing_element) && $pushing_element == "message:override" )
+        {
+            #
+            # We're posting a message. It comes in $as_link_message
+            #
+            $item->data = (object) array(
+                "owner" => $resource_urn,
+                "text" => (object) array(
+                    "text" => $as_link_message
+                ),
+                "distribution" => (object) array(
+                    "linkedInDistributionTarget" => (object) array()
+                )
+            );
+        }
+        elseif( is_string($pushing_element) && $pushing_element != "message:override" )
+        {
+            #
+            # We're posting a link.
+            #
+            
+            $post = $this->get_post_from_permalink($pushing_element);
+            
+            $item->data = (object) array(
+                "owner" => $resource_urn,
+                "content" => (object) array(
+                    "contentEntities" => array(
+                        (object) array(
+                            "entityLocation" => $pushing_element,
+                        )
+                    ),
+                    "title" => is_object($post) ? $post->title : $settings->get("engine.website_name"),
+                ),
+                "text" => (object) array(
+                    "text" => $as_link_message
+                ),
+                "distribution" => (object) array(
+                    "linkedInDistributionTarget" => (object) array()
+                )
+            );
+        }
+        else
+        {
+            #
+            # We're posting a post
+            #
+            $item->data = (object) array(
+                "owner" => $resource_urn,
+                "content" => (object) array(
+                    "contentEntities" => array(
+                        (object) array(
+                            "entityLocation" => $pushing_element->get_permalink(true),
+                            "thumbnails" => array(
+                                (object) array(
+                                    "resolvedUrl" => "{$config->full_root_url}/{$pushing_element->featured_image_thumbnail}"
+                                )
+                            )
+                        )
+                    ),
+                    "title" => $pushing_element->title
+                ),
+                "subject" => $pushing_element->title,
+                "text" => (object) array(
+                    "text" => $as_link_message
+                ),
+                "distribution" => (object) array(
+                    "linkedInDistributionTarget" => (object) array()
+                )
+            );
+        }
+        
+        $url = "https://api.linkedin.com/{$item->endpoint}";
+        $ch  = curl_init();
+        curl_setopt($ch, CURLOPT_URL,            $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_POST,           1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,     $item->headers);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,     json_encode($item->data));
+        
+        $item_type  = $item->type;
+        $item_title = $item->title;
+        
+        // $logentry = sprintf(
+        //     "----------------------------------------------------------------\n" .
+        //     "[%s] Posting to %s\n" .
+        //     "----------------------------------------------------------------\n" .
+        //     "Details:\n• Headers: %s\n• Payload: %s\n• Endpoint data: %s\n• Token: %s\n",
+        //     date("Y-m-d H:i:s"),
+        //     $url,
+        //     trim(print_r($item->headers, true)),
+        //     trim(print_r($item->data, true)),
+        //     trim(print_r($endpoint_data, true)),
+        //     $token_string
+        // );
+        // @file_put_contents("{$config->logfiles_location}/autopush_for_linkedin_debug.log", $logentry, FILE_APPEND);
+        $res = curl_exec($ch);
+        // $logentry = "• Curl error: " . curl_error($ch) . "\n"
+        //           . "• Response: $res\n\n";
+        // @file_put_contents("{$config->logfiles_location}/autopush_for_linkedin_debug.log", $logentry, FILE_APPEND);
+        sleep(1);
+        
+        if( curl_error($ch) )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->cannot_post_to_linkedin,
+                $item_type, $item_title, $resource_name, curl_error($ch)
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            curl_close($ch);
+            
+            return;
+        }
+        
+        curl_close($ch);
+        
+        if( empty($res) )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->empty_linkedin_res,
+                $resource_name, $item_type, $item_title
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        $obj = @json_decode($res);
+        if( ! is_object($obj) )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->unknown_linkedin_res,
+                $item_type, $item_title, $resource_name, strip_tags($res)
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        if( $obj->serviceErrorCode )
+        {
+            $error = unindent(sprintf(
+                $current_module->language->messages->linkedin_api_error_received,
+                $item_type, $item_title, $resource_name, $obj->message
+            ));
+            
+            $config->globals["@autopush:sending_errors"][] = $error;
+            
+            if( $notifications_target ) send_notification($notifications_target, "error", $error);
+            
+            return;
+        }
+        
+        $config->globals["@autopush:messages_sent"]++;
+    }
+    
+    /**
      * @param post_record $post
      * @param string      $method as_link|as_pieces
      * 
@@ -803,5 +1131,36 @@ class toolbox
         $config->globals["@autopush:messages_count"] = count($return);
         
         return $return;
+    }
+    
+    /**
+     * Extracts the slug from the permalink and looks it up in the database.
+     * If found, returns a post record.
+     * If not, returns the permalink.
+     * 
+     * @param string $permalink
+     * @return string|post_record
+     */
+    private function get_post_from_permalink($permalink)
+    {
+        try
+        {
+            check_sql_injection($permalink);
+        }
+        catch(\Exception $e)
+        {
+            return $permalink;
+        }
+        
+        static $repository = null;
+        if( is_null($repository) ) $repository = new posts_repository();
+        
+        $parts = parse_url($permalink);
+        $path  = $parts['path'];
+        $parts = explode("/", $path);
+        $slug  = end($parts);
+        $post  = $repository->get_by_id_or_slug($slug);
+        
+        return is_null($post) ? $permalink : $post;
     }
 }

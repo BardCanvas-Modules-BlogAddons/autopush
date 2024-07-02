@@ -81,6 +81,36 @@ foreach(explode("\n", $raw_endpoints) as $line)
         $endpoints["telegram"][$slug]["token"]       = $parts[1];
         $endpoints["telegram"][$slug]["target"]      = $parts[2];
     }
+    elseif( substr($line, 0, 17) == "linkedin_profile:" )
+    {
+        $line  = substr($line, 18);
+        $parts = explode(", ", $line);
+        
+        if( empty($parts[0]) ) continue;
+        if( empty($parts[1]) ) continue;
+        if( empty($parts[2]) ) continue;
+        
+        $slug  = wp_sanitize_filename($parts[0]);
+        
+        $endpoints["linkedin_profile"][$slug]["title"]  = $parts[0];
+        $endpoints["linkedin_profile"][$slug]["token"]  = $parts[1];
+        $endpoints["linkedin_profile"][$slug]["target"] = $parts[2];
+    }
+    elseif( substr($line, 0, 17) == "linkedin_company:" )
+    {
+        $line  = substr($line, 18);
+        $parts = explode(", ", $line);
+        
+        if( empty($parts[0]) ) continue;
+        if( empty($parts[1]) ) continue;
+        if( empty($parts[2]) ) continue;
+        
+        $slug  = wp_sanitize_filename($parts[0]);
+        
+        $endpoints["linkedin_company"][$slug]["title"]  = $parts[0];
+        $endpoints["linkedin_company"][$slug]["token"]  = $parts[1];
+        $endpoints["linkedin_company"][$slug]["target"] = $parts[2];
+    }
 }
 if( empty($endpoints) ) return;
 

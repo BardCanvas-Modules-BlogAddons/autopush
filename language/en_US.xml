@@ -12,6 +12,8 @@
         <option value="twitter">Twitter app</option>
         <option value="discord">Discord Webhook</option>
         <option value="telegram">Telegram bot</option>
+        <option value="linkedin_profile">Linkedin personal profile</option>
+        <option value="linkedin_company">Linkedin company page</option>
     </add_selector>
     
     <new>
@@ -40,6 +42,7 @@
                 </token_secret>
             </fields>
         </twitter>
+        
         <discord>
             <legend>New Discord Webhook</legend>
             <fields>
@@ -53,6 +56,7 @@
                 </webhook>
             </fields>
         </discord>
+        
         <telegram>
             <legend>New Telegram target</legend>
             <fields>
@@ -70,9 +74,80 @@
                 </target>
             </fields>
         </telegram>
+        
+        <linkedin_profile>
+            <legend><![CDATA[ New Linkedin <u>personal profile</u> target ]]></legend>
+            <info><![CDATA[
+                <i class="fa fa-info-circle"></i> You need to use
+                «BardCanvas Autopush for Linkedin» in order to obtain an access token.<br>
+                
+                <a class="framed_content inlined state_ok" href="{$link}"  target="_blank">
+                    <i class="fa fa-external-link"></i>
+                    Click here to authorize it
+                </a><br>
+                
+                If you want to push to a profile you already authorized,
+                paste the token and resource id below.
+            ]]></info>
+            <fields>
+                <title>
+                    <caption>Title:</caption>
+                    <placeholder>Title for this endpoint (E.G. your name)</placeholder>
+                </title>
+                <token>
+                    <caption>Token:</caption>
+                    <placeholder>Paste the token provided by the BC autopush app</placeholder>
+                </token>
+                <target>
+                    <caption>Resource id:</caption>
+                    <placeholder>Paste the resource id provided by the BC autopush app</placeholder>
+                </target>
+            </fields>
+            <token_expiration>Token expiration:</token_expiration>
+            <resource_details>Resource details:</resource_details>
+            <invalid_token><![CDATA[
+                The token is invalid! Please reauthorize the app and paste again.
+                <a href="{$link}" target="_blank"><i class="fa fa-external-link"></i> Do it now</a>.
+            ]]></invalid_token>
+            <invalid_resource><![CDATA[
+                The resource id is invalid! Please reauthorize the app and paste again.
+                <a href="{$link}" target="_blank"><i class="fa fa-external-link"></i> Do it now</a>.
+            ]]></invalid_resource>
+        </linkedin_profile>
+        
+        <linkedin_company>
+            <legend><![CDATA[ New Linkedin <u>company page</u> target ]]></legend>
+            <info><![CDATA[
+                <i class="fa fa-info-circle"></i> You need to use
+                «BardCanvas Autopush for Linkedin» in order to obtain an access token.<br>
+                
+                <a class="framed_content inlined state_ok" href="{$link}"  target="_blank">
+                    <i class="fa fa-external-link"></i>
+                    Click here to authorize it
+                </a><br>
+                
+                If you want to push to a website page you already authorized,
+                paste the token and resource id below.
+            ]]></info>
+            <fields>
+                <title>
+                    <caption>Title:</caption>
+                    <placeholder>Title for this endpoint (E.G. your name)</placeholder>
+                </title>
+                <token>
+                    <caption>Token:</caption>
+                    <placeholder>Paste the token provided by the BC autopush app</placeholder>
+                </token>
+                <target>
+                    <caption>Resource id:</caption>
+                    <placeholder>Paste the resource id provided by the BC autopush app</placeholder>
+                </target>
+            </fields>
+        </linkedin_company>
     </new>
     
     <remove>Remove</remove>
+    <replace>Replace...</replace>
     
     <autopush_to_socnet>Push to Social Networks</autopush_to_socnet>
     <push_as_link>Send a link to the post</push_as_link>
@@ -166,6 +241,10 @@
             Post successfully pushed to %s through <span class="alternate">%s</span>
             (%s/%s messages sent)
         ]]></push_ok>
+        <push_ok2><![CDATA[
+            Successfully pushed to %s through <span class="alternate">%s</span>
+            (%s/%s messages sent)
+        ]]></push_ok2>
         <pushed_info><![CDATA[
             Pushed as {$pushed_as} by {$sender} on {$date}.
             Messages sent: {$sent}/{$count}.
@@ -218,6 +297,38 @@
             %s
         ]]></telegram_api_error_received>
         
+        <malformed_linkedin_token><![CDATA[
+            Unable to post %s "%s" to Linkedin target %s: the token is malformed. It needs to be reacquired.
+        ]]></malformed_linkedin_token>
+        <linkedin_token_expired><![CDATA[
+            Unable to post %s "%s" to Linkedin target %s: the token has expired. It needs to be refreshed.
+        ]]></linkedin_token_expired>
+        <malformed_linkedin_resource_id><![CDATA[
+            Unable to post %s "%s" to Linkedin target %s: malformed resource id. It needs to be reacquired.
+        ]]></malformed_linkedin_resource_id>
+        <invalid_linkedin_profile_id><![CDATA[
+            Unable to post %s "%s" to Linkedin target %s: invalid profile in the resource id. It needs to be reacquired.
+        ]]></invalid_linkedin_profile_id>
+        <invalid_linkedin_company_id><![CDATA[
+            Unable to post %s "%s" to Linkedin target %s (owned by %s): invalid company in the resource id. It needs to be reacquired.
+        ]]></invalid_linkedin_company_id>
+        <cannot_post_to_linkedin><![CDATA[
+            Unable to post %s "%s" to Linkedin resource %s due to a network/server error:<br>
+            %s
+        ]]></cannot_post_to_linkedin>
+        <empty_linkedin_res><![CDATA[
+            No response received from Linkedin resource %s after pushing the %s "%s".
+            It isn't possible to know if the message was posted or not.
+        ]]></empty_linkedin_res>
+        <unknown_linkedin_res><![CDATA[
+            The %s "%s" was submitted to %s but Linkedin's response doesn't seem to be a valid object:
+            %s
+        ]]></unknown_linkedin_res>
+        <linkedin_api_error_received><![CDATA[
+            Linkedin returned an error when posting %s "%s" to %s:<br>
+            %s
+        ]]></linkedin_api_error_received>
+        
         <cannot_fetch_image><![CDATA[
             Unable to fetch image file "%s" due to a network/server error:<br>
             %s<br>
@@ -238,6 +349,10 @@
             Sorry, but this post can't be pushed to Social Networks
             because the post main category not public.
         ]]></post_category_not_public>
+        
+        <as_link_only><![CDATA[
+            Sorry, but only links can be sent to %s.
+        ]]></as_link_only>
         
     </messages>
     
@@ -260,15 +375,14 @@
         Value format:
         ┌───────────────────────────────────────────────────────────────────────────┐
         │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
-        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
-        │ twitter: title, consumer_key, consumer_secret, access_token, token_secret │
-        │ discord: title, webhook_url                                               │
-        │ discord: title, webhook_url                                               │
         │ discord: title, webhook_url                                               │
         │ telegram: title, token, target                                            │
-        │ telegram: title, token, target                                            │
-        │ telegram: title, token, target                                            │
+        │ linkedin_profile: title, token, target                                    │
+        │ linkedin_company: title, token, target                                    │
         └───────────────────────────────────────────────────────────────────────────┘
+        Note: for linkedin, the token is an encrypted string with three fields:
+        Note: > linkedin_token,expiration_timestamp,target_id
+        Note: The target_id field is the personal profile id or the company id.
         -->
         <specs key="endpoints">
             <title>Social network endpoints</title>
@@ -284,7 +398,7 @@
                     This module supports pushing to:
                     <ul>
                         <li>
-                            Twitter: a client application must be created at the
+                            <b>Twitter:</b> a client application must be created at the
                             <a href="https://developer.twitter.com" target="_blank">Twitter Developer</a> site
                             and the next details must be provided for each application:
                             <ul>
@@ -293,18 +407,38 @@
                                 <li>Access token</li>
                                 <li>Access token secret</li>
                             </ul>
+                            <br>
                         </li>
                         <li>
-                            Discord: for each channel on your server, you need to create a
+                            <b>Discord:</b for each channel on your server, you need to create a
                             <a href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank">Webhook</a>,
-                            then provide the URL to each Webhook you've created.
+                            then provide the URL to each Webhook you've created.<br>
+                            <br>
                         </li>
                         <li>
-                            Telegram: you need to create a bot and get a token, then
+                            <b>Telegram:</b> you need to create a bot and get a token, then
                             specify the targets you want to push to
                             (<code>@chat</code> or <code>@channel</code>).<br>
                             <b>Note:</b> you'll need to add your bot to the target chat/channel and grant it posting privileges.<br>
-                            <a href="https://core.telegram.org/bots#3-how-do-i-create-a-bot" target="_blank">Click here</a> to learn how to create a bot.
+                            <a href="https://core.telegram.org/bots#3-how-do-i-create-a-bot" target="_blank">Click here</a>
+                            to learn how to create a bot.<br>
+                            <br>
+                        </li>
+                        <li>
+                            <b>Linkedin <u>personal profile</u>:</b>
+                            you need to use our BardCanvas Autopush app for Linkedin.<br>
+                            From there, you'll be given a token and a resource id
+                            so you can paste in the corresponding input boxes.<br>
+                            All posts will be pushed on your behalf, and they'll be shown on your wall.<br>
+                            <br>
+                        </li>
+                        <li>
+                            <b>Linkedin <u>company page</u>:</b>
+                            you also need to use our BardCanvas Autopush app for Linkedin.<br>
+                            From there, you'll be given a token and a resource id
+                            so you can paste in the corresponding input boxes.<br>
+                            <b>Important:</b> you need to be administrator of the page you want to post to.<br>
+                            <br>
                         </li>
                     </ul>
                     
@@ -386,7 +520,7 @@ Discord/My Discord channel 2: <b>user_news</b></pre>
                     If you want to use a different message for certain categories, you need to specify all the
                     category-based messages <u>first</u> and one or more fallback messages below using the next syntax:
                     
-                    <pre>@category_slug - message
+                    <pre>@category_slug: message
 @category_slug: message
 @category_slug: message
 global fallback message

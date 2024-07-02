@@ -10,3 +10,6 @@
 .autopush-icon.twitter  { background-image: url("twitter.png"); }
 .autopush-icon.discord  { background-image: url("discord.png"); }
 .autopush-icon.telegram { background-image: url("telegram.png"); }
+
+.autopush-icon.linkedin_profile { background-image: url("linkedin_profile.png"); }
+.autopush-icon.linkedin_company { background-image: url("linkedin_company.png"); }

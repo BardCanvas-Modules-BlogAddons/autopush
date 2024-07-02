@@ -13,6 +13,10 @@
  */
 
 use hng2_base\module;
+
+global $settings, $template;
+
+$encryption_key = "bfxFUbgQbQ7QNCmVaK";
 ?>
 
 <!-- Autopush Scripts -->
@@ -36,6 +40,14 @@ use hng2_base\module;
     #autopush_endpoints_container .target fieldset[data-network="telegram"] legend { color: #0D86D7; background-color: white;
                                                                                      border: 2px outset #0D86D7; border-radius: 5px; }
     
+    #autopush_endpoints_container .target fieldset[data-network="linkedin_profile"]        { border-color: #0077b7; background-color: #F0F7FB; }
+    #autopush_endpoints_container .target fieldset[data-network="linkedin_profile"] legend { color: #0077b7; background-color: white;
+                                                                                             border: 2px outset #0077b7; border-radius: 5px; }
+    
+    #autopush_endpoints_container .target fieldset[data-network="linkedin_company"]        { border-color: #992e96; background-color: #F9F4F9; }
+    #autopush_endpoints_container .target fieldset[data-network="linkedin_company"] legend { color: #992e96; background-color: white;
+                                                                                             border: 2px outset #992e96; border-radius: 5px; }
+    
     #autopush_endpoints_container .target fieldset.new { box-shadow: 0 0 5px green; }
 </style>
 
@@ -47,7 +59,9 @@ use hng2_base\module;
         
         var html    = $('#autopush_endpoint_templates').find(sprintf('template.%s', key)).html();
         var $target = $('#autopush_endpoints_container').find('.target');
-        $target.append(html);
+        var $item   = $(html);
+        $item.find('.expandible_textarea').expandingTextArea();
+        $target.append($item);
         $target.scrollTo('max', 'fast');
         
         $('#add_endpoint_selector').find('option:first').prop('selected', true);
@@ -99,7 +113,17 @@ use hng2_base\module;
                         '%s: %s, %s, %s',
                         network,
                         $this.find('input[data-field="title"]').val().replace(/,:'"/, '').trim(),
-                        $this.find('input[data-field="token"]').val().trim(),
+                        $this.find('input[data-field="token"]').val().trim().replace(/\s/g, ''),
+                        $this.find('input[data-field="target"]').val().trim()
+                    ));
+                    break;
+                case 'linkedin_profile':
+                case 'linkedin_company':
+                    options.push(sprintf(
+                        '%s: %s, %s, %s',
+                        network,
+                        $this.find('input[data-field="title"]').val().replace(/,:'"/, '').trim(),
+                        $this.find('textarea[data-field="token"]').val().trim().replace(/\s/g, ''),
                         $this.find('input[data-field="target"]').val().trim()
                     ));
                     break;
@@ -113,6 +137,7 @@ use hng2_base\module;
 </script>
 
 <div id="autopush_endpoint_templates" style="display: none">
+    
     <template class="twitter">
         <fieldset class="new" data-network="twitter">
             <legend>
@@ -136,6 +161,7 @@ use hng2_base\module;
             </table>
         </fieldset>
     </template>
+    
     <template class="discord">
         <fieldset class="new" data-network="discord">
             <legend>
@@ -160,6 +186,7 @@ use hng2_base\module;
             </table>
         </fieldset>
     </template>
+    
     <template class="telegram">
         <fieldset class="new" data-network="telegram">
             <legend>
@@ -184,4 +211,95 @@ use hng2_base\module;
             </table>
         </fieldset>
     </template>
+    
+    <?
+    $sp_url  = $config->full_root_url;
+    $sp_name = $settings->get('engine.website_name');
+    $sp_icon = $settings->get('engine.favicon');
+    if( empty($sp_icon) ) $sp_icon = $template->get("favicon");
+    if( empty($sp_icon) ) $sp_icon = "none";
+    ?>
+    
+    <template class="linkedin_profile">
+        <fieldset class="new" data-network="linkedin_profile">
+            <legend>
+                <i class="autopush-icon linkedin_profile"></i>
+                <?= $this_module->language->new->linkedin_profile->legend ?>
+                <button onclick="$(this).closest('fieldset').hide('fast', function() { $(this).remove(); }); return false;">
+                    <i class="fa fa-trash"></i>
+                    <?= $this_module->language->remove ?>
+                </button>
+            </legend>
+            
+            <div class="framed_content state_highlight" style="margin: 0 0 5px 0;">
+                <?= replace_escaped_objects($this_module->language->new->linkedin_profile->info, array(
+                    '{$link}' => sprintf(
+                        "https://bardcanvas.com/autopush-for-linkedin-authorization?start=%s",
+                        urlencode(encrypt("profile\t{$sp_url}\t{$sp_name}\t{$sp_icon}", $encryption_key))
+                    )
+                )) ?>
+            </div>
+            
+            <table class="nav_table_inner">
+                <? foreach(array("title", "token", "target") as $field): ?>
+                    <tr>
+                        <th nowrap><?= $this_module->language->new->linkedin_profile->fields->{$field}->caption ?></th>
+                        <td width="100%">
+                            <? if( $field == "token" ): ?>
+                                <textarea class="expandible_textarea" data-field="<?= $field ?>"
+                                       placeholder="<?= $this_module->language->new->linkedin_profile->fields->{$field}->placeholder ?>"
+                                       onblur="rebuild_autopush_endpoints()"></textarea>
+                            <? else: ?>
+                                <input type="text" data-field="<?= $field ?>"
+                                       placeholder="<?= $this_module->language->new->linkedin_profile->fields->{$field}->placeholder ?>"
+                                       style="width: 100%" onblur="rebuild_autopush_endpoints()">
+                            <? endif; ?>
+                        </td>
+                    </tr>
+                <? endforeach; ?>
+            </table>
+        </fieldset>
+    </template>
+    
+    <template class="linkedin_company">
+        <fieldset class="new" data-network="linkedin_company">
+            <legend>
+                <i class="autopush-icon linkedin_company"></i>
+                <?= $this_module->language->new->linkedin_company->legend ?>
+                <button onclick="$(this).closest('fieldset').hide('fast', function() { $(this).remove(); }); return false;">
+                    <i class="fa fa-trash"></i>
+                    <?= $this_module->language->remove ?>
+                </button>
+            </legend>
+
+            <div class="framed_content state_highlight" style="margin: 0 0 5px 0;">
+                <?= replace_escaped_objects($this_module->language->new->linkedin_company->info, array(
+                    '{$link}' => sprintf(
+                        "https://bardcanvas.com/autopush-for-linkedin-authorization?start=%s",
+                        urlencode(encrypt("company\t{$sp_url}\t{$sp_name}\t{$sp_icon}", $encryption_key))
+                    )
+                )) ?>
+            </div>
+            
+            <table class="nav_table_inner">
+                <? foreach(array("title", "token", "target") as $field): ?>
+                    <tr>
+                        <th nowrap><?= $this_module->language->new->linkedin_company->fields->{$field}->caption ?></th>
+                        <td width="100%">
+                            <? if( $field == "token" ): ?>
+                                <textarea class="expandible_textarea" data-field="<?= $field ?>"
+                                          placeholder="<?= $this_module->language->new->linkedin_profile->fields->{$field}->placeholder ?>"
+                                          onblur="rebuild_autopush_endpoints()"></textarea>
+                            <? else: ?>
+                                <input type="text" data-field="<?= $field ?>"
+                                       placeholder="<?= $this_module->language->new->linkedin_profile->fields->{$field}->placeholder ?>"
+                                       style="width: 100%" onblur="rebuild_autopush_endpoints()">
+                            <? endif; ?>
+                        </td>
+                    </tr>
+                <? endforeach; ?>
+            </table>
+        </fieldset>
+    </template>
+    
 </div>

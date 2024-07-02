@@ -48,13 +48,16 @@ use hng2_base\template;
                             <i class="fa fa-info-circle pseudo_link"
                                onclick="show_discardable_dialog('#autopush_aslink_info')"></i>
                         </p><p>
-                            <label>
-                                <input type="radio" name="autopush_to[<?= $network ?>][<?= $slug ?>][method]"
+                            <? $disabled = in_array($network, array("linkedin_profile", "linkedin_company")) ? "disabled" : ""; ?>
+                            <label class="<?= $disabled ?>">
+                                <input type="radio" <?= $disabled ?> name="autopush_to[<?= $network ?>][<?= $slug ?>][method]"
                                        value="as_pieces" onchange="enable_autopush_endpoint_state(this)">
                                 <?= $this_module->language->push_as_pieces ?>
                             </label>
-                            <i class="fa fa-info-circle pseudo_link"
-                               onclick="show_discardable_dialog('#autopush_aspieces_info')"></i>
+                            <? if( ! $disabled ): ?>
+                                <i class="fa fa-info-circle pseudo_link"
+                                   onclick="show_discardable_dialog('#autopush_aspieces_info')"></i>
+                            <? endif; ?>
                         </p>
                     </div>
                 </div>

@@ -17,7 +17,7 @@
         <post_footer>post_footer_scripts.inc</post_footer>
         <header_menu>header_menu.inc</header_menu>
         <always_on>
-            <file>media/styles~v1.0.0.1.css</file>
+            <file>media/styles~v1.1.0-2.css</file>
         </always_on>
     </template_includes>
     

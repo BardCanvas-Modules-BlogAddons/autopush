@@ -31,7 +31,7 @@ if( empty($endpoints) ) return;
 
 <!-- Autopush to social networks "push element" helper stuff -->
 
-<link rel="stylesheet" type="text/css" href="<?= $this_module->get_url() ?>/media/form_styles~v1.0.1.css">
+<link rel="stylesheet" type="text/css" href="<?= $this_module->get_url() ?>/media/form_styles~v1.1.0-2.css">
 
 <script type="text/javascript" src="<?= $this_module->get_url() ?>/media/form_scripts~v1.0.0.js"></script>
 
