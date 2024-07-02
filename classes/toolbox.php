@@ -588,6 +588,8 @@ class toolbox
         
         $payloads = array();
         
+        list($chat_id, $message_thread_id) = explode("#", $endpoint_data["target"]);
+        
         if( $method == "as_link" )
         {
             if( is_object($pushing_element) )
@@ -604,7 +606,8 @@ class toolbox
                 "endpoint" => "sendMessage",
                 "title"    => $title,
                 "data" => array(
-                    "chat_id"    => $endpoint_data["target"],
+                    "chat_id"    => $chat_id,
+                    "message_thread_id" => $message_thread_id,
                     "text"       => $s_text,
                     "parse_mode" => "HTML",
                 )
@@ -621,7 +624,8 @@ class toolbox
                         "endpoint" => "sendPhoto",
                         "title"    => $message,
                         "data" => array(
-                            "chat_id"    => $endpoint_data["target"],
+                            "chat_id"    => $chat_id,
+                            "message_thread_id" => $message_thread_id,
                             "photo"      => $message,
                             "caption"    => basename($message),
                             "parse_mode" => "HTML",
@@ -635,7 +639,8 @@ class toolbox
                         "endpoint" => "sendVideo",
                         "title"    => $message,
                         "data" => array(
-                            "chat_id"    => $endpoint_data["target"],
+                            "chat_id"    => $chat_id,
+                            "message_thread_id" => $message_thread_id,
                             "video"      => $message,
                             "caption"    => basename($message),
                             "parse_mode" => "HTML",
@@ -648,7 +653,8 @@ class toolbox
                         "endpoint" => "sendMessage",
                         "title"    => make_excerpt_of($message),
                         "data" => array(
-                            "chat_id"    => $endpoint_data["target"],
+                            "chat_id"    => $chat_id,
+                            "message_thread_id" => $message_thread_id,
                             "text"       => make_excerpt_of($message, 3000),
                             "parse_mode" => "HTML",
                         )
