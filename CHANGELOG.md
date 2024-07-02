@@ -1,6 +1,19 @@
 
 # Autopush Module Change Log
 
+## [ToDo]
+
+- Recrypt linkedin tokens and resource ids with the local encryption key before saving.
+- Translate the language file.
+- Test if the other methods weren't broken with this last change.
+- Review tokens management.
+- Release and push.
+
+# [1.5.0] - 2024-07-02
+
+- Updated support for changes in APIs (LinkedIn, Twitter and Telegram).
+- Added support for pushing to telegram topics in SuperGroups.
+
 ## [1.4.1] - 2020-04-27
 
 - Added POST headers recently required by Discord.
